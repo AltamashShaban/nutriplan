@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#6C5CE7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NutriPlan">
+<meta name="description" content="Healthy halal meal plans, calorie tracking and progress charts. All data stays on your device.">
+<title>NutriPlan — Halal Meal Planner</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --violet:#6C5CE7; --violet-2:#8B7BF5; --violet-3:#A99BFA; --violet-ink:#5546C8;
+  --lav:#EFECFF; --lav-2:#F7F5FF;
+  --bg:#F4F3FC; --card:#FFFFFF; --ink:#1B1A33; --muted:#8C8BA8; --line:#EDEAF9;
+  --cyan:#2BD0DE; --blue:#5B9BFF; --coral:#FF7C6B; --amber:#FFC65C; --mint:#4FD1A5;
+  --p:#6C5CE7; --c:#2BD0DE; --f:#FF9F7C;
+  --r:26px; --r2:20px; --r3:15px;
+  --sh:0 8px 26px rgba(89,73,196,.09);
+  --sh2:0 14px 40px rgba(89,73,196,.16);
+  --font:'Poppins','Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI Variable','Segoe UI',Inter,system-ui,sans-serif;
+}
+body.dark{
+  --violet:#8B7BF5; --violet-2:#A99BFA; --violet-3:#C4BAFC; --violet-ink:#7A6AE8;
+  --lav:#241F44; --lav-2:#1C1836;
+  --bg:#100E22; --card:#191634; --ink:#EDEBFA; --muted:#8683A8; --line:#252044;
+  --sh:0 8px 26px rgba(0,0,0,.4); --sh2:0 14px 40px rgba(0,0,0,.5);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.5;
+  -webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+#app{max-width:600px;margin:0 auto;padding-bottom:104px;min-height:100vh}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+/* ============ type ============ */
+.ov{font-size:10.5px;font-weight:750;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--violet);margin-bottom:7px}
+.ov.m{color:var(--muted)}
+h1.big{font-size:27px;font-weight:800;letter-spacing:-.9px;line-height:1.18}
+h2.mid{font-size:20px;font-weight:750;letter-spacing:-.5px}
+.num{font-weight:800;letter-spacing:-1.6px;line-height:1}
+.muted{color:var(--muted)}
+.tiny{font-size:11.5px;color:var(--muted);font-weight:500}
+.sm{font-size:13px}
+.hl{color:var(--violet);font-weight:750}
+.center{text-align:center}
+.hidden{display:none!important}
+
+/* ============ violet header + sheet ============ */
+.vh{background:linear-gradient(160deg,var(--violet) 0%,var(--violet-2) 100%);
+  color:#fff;padding:calc(18px + env(safe-area-inset-top)) 20px 34px;position:relative;overflow:hidden}
+.vh:after{content:'';position:absolute;width:230px;height:230px;border-radius:50%;
+  background:rgba(255,255,255,.07);top:-120px;right:-70px}
+.vh:before{content:'';position:absolute;width:150px;height:150px;border-radius:50%;
+  background:rgba(255,255,255,.05);bottom:-90px;left:-40px}
+.vh > *{position:relative;z-index:1}
+.vh .ov{color:rgba(255,255,255,.72)}
+.vh h1.big{color:#fff}
+.sheet-b{background:var(--bg);border-radius:28px 28px 0 0;margin-top:-24px;
+  padding:22px 20px 8px;position:relative;z-index:2;min-height:40vh}
+.wrap{padding:20px 20px 8px}
+
+/* ============ cards ============ */
+.c{background:var(--card);border-radius:var(--r);padding:20px;box-shadow:var(--sh);margin-bottom:16px}
+.c.tight{padding:16px}
+.c.flat{box-shadow:none;border:1.5px solid var(--line)}
+.vcard{background:linear-gradient(150deg,var(--violet) 0%,var(--violet-2) 100%);color:#fff;
+  border-radius:var(--r);padding:20px;box-shadow:var(--sh2);margin-bottom:16px;position:relative;overflow:hidden}
+.vcard:after{content:'';position:absolute;width:180px;height:180px;border-radius:50%;
+  background:rgba(255,255,255,.08);top:-90px;right:-60px}
+.vcard > *{position:relative;z-index:1}
+.vcard .ov{color:rgba(255,255,255,.75)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+
+/* ============ tiles & buttons ============ */
+.tile{width:52px;height:52px;border-radius:17px;display:flex;align-items:center;
+  justify-content:center;font-size:24px;flex-shrink:0;background:var(--lav)}
+.tile.s{width:42px;height:42px;border-radius:14px;font-size:19px}
+.plus{width:32px;height:32px;border-radius:11px;background:var(--lav);color:var(--violet);
+  display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;
+  flex-shrink:0;line-height:1;padding-bottom:2px}
+.btn{background:var(--violet);color:#fff;border-radius:16px;padding:15px 18px;font-weight:650;
+  font-size:15px;width:100%;box-shadow:0 8px 20px rgba(108,92,231,.32);transition:transform .12s,opacity .12s}
+.btn:active{transform:scale(.975);opacity:.9}
+.btn.ghost{background:var(--lav);color:var(--violet);box-shadow:none}
+.btn.line{background:transparent;border:1.8px solid var(--line);color:var(--ink);box-shadow:none}
+.btn.danger{background:transparent;border:1.8px solid var(--line);color:var(--coral);box-shadow:none}
+.btn.s{padding:11px 16px;font-size:13.5px;width:auto;border-radius:13px}
+.btn.white{background:#fff;color:var(--violet);box-shadow:0 8px 20px rgba(0,0,0,.13)}
+
+/* ============ chips / segmented ============ */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 15px;border-radius:14px;font-size:13px;font-weight:650;background:var(--card);
+  color:var(--muted);white-space:nowrap;box-shadow:var(--sh)}
+.chip.on{background:var(--violet);color:#fff;box-shadow:0 6px 16px rgba(108,92,231,.3)}
+.chip.mini{padding:6px 12px;font-size:11.5px;border-radius:10px;box-shadow:none;background:var(--lav);color:var(--violet)}
+.seg{display:flex;background:rgba(255,255,255,.18);border-radius:15px;padding:4px;gap:3px}
+.seg button{flex:1;padding:9px 4px;border-radius:12px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.seg button.on{background:#fff;color:var(--violet);box-shadow:0 3px 10px rgba(0,0,0,.12)}
+
+/* ============ week strip ============ */
+.week{display:flex;gap:4px;justify-content:space-between}
+.wd{flex:1;text-align:center;padding:8px 2px;border-radius:16px;position:relative}
+.wd .d{font-size:9.5px;font-weight:700;letter-spacing:.8px;opacity:.72}
+.wd .n{font-size:15.5px;font-weight:750;margin-top:3px}
+.wd.on{background:#fff;color:var(--violet)}
+.wd.on .d{opacity:.6}
+.wd .dot{width:4px;height:4px;border-radius:50%;background:currentColor;margin:3px auto 0;opacity:.85}
+
+/* ============ list rows ============ */
+.it{display:flex;align-items:center;gap:13px;padding:11px 0}
+.it + .it{border-top:1px solid var(--line)}
+.it .mid{flex:1;min-width:0}
+.it .nm{font-size:14.5px;font-weight:650;letter-spacing:-.2px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.it .dt{font-size:12px;color:var(--muted);margin-top:2px;font-weight:500}
+.it .rt{text-align:right;flex-shrink:0}
+.it .rt b{font-size:15px;font-weight:750}
+.x{color:var(--muted);font-size:17px;padding:2px 4px;line-height:1;opacity:.55}
+.tap{cursor:pointer}
+.kcal{display:inline-flex;align-items:center;gap:4px;font-weight:750}
+.kcal i{font-style:normal;color:var(--violet)}
+
+/* ============ bars ============ */
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.bar.thin{height:5px}
+.mac{margin-bottom:13px}
+.mac:last-child{margin-bottom:0}
+.mac .t{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px;font-weight:600}
+.sw{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:middle}
+
+/* ============ grid cards (recipes) ============ */
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.rcard{background:var(--card);border-radius:var(--r2);overflow:hidden;box-shadow:var(--sh)}
+.rcard .th{height:88px;display:flex;align-items:center;justify-content:center;font-size:38px}
+.rcard .bd{padding:11px 13px 13px}
+.rcard .nm{font-size:13.5px;font-weight:680;letter-spacing:-.2px;line-height:1.3;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:35px}
+.rcard .mt{font-size:11px;color:var(--muted);margin-top:5px;font-weight:600}
+
+/* ============ modal ============ */
+.ovl{position:fixed;inset:0;background:rgba(27,26,51,.5);z-index:100;display:flex;
+  align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sh{background:var(--bg);width:100%;max-width:600px;max-height:94vh;overflow-y:auto;
+  border-radius:30px 30px 0 0;animation:up .32s cubic-bezier(.2,.9,.3,1);position:relative}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sh .grab{width:42px;height:4.5px;border-radius:99px;background:var(--line);
+  margin:10px auto 0;position:sticky;top:10px;z-index:5}
+.sh .bd{padding:8px 20px 34px}
+.cl{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;
+  background:var(--card);color:var(--muted);font-size:17px;z-index:6;box-shadow:var(--sh);
+  display:flex;align-items:center;justify-content:center}
+
+/* ============ inputs ============ */
+input,select{font:inherit;font-weight:600;width:100%;padding:14px 15px;border:1.8px solid var(--line);
+  border-radius:16px;background:var(--card);color:var(--ink);outline:none;transition:border-color .15s}
+input:focus,select:focus{border-color:var(--violet)}
+input::placeholder{color:var(--muted);font-weight:500}
+label{display:block;font-size:11.5px;font-weight:700;letter-spacing:.4px;color:var(--muted);
+  margin-bottom:7px;text-transform:uppercase}
+.fld{margin-bottom:15px}
+.srch{position:relative;margin-bottom:14px}
+.srch input{padding-left:44px;border-radius:18px;border-color:transparent;box-shadow:var(--sh)}
+.srch .i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px}
+.step{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;
+  padding:6px;box-shadow:var(--sh)}
+.step button{width:38px;height:38px;border-radius:12px;background:var(--lav);color:var(--violet);
+  font-size:19px;font-weight:600;flex-shrink:0}
+.step .v{flex:1;text-align:center;font-weight:750;font-size:15px}
+
+/* ============ nav ============ */
+nav{position:fixed;bottom:0;left:0;right:0;z-index:60;display:flex;justify-content:center;
+  pointer-events:none;padding:0 14px calc(14px + env(safe-area-inset-bottom))}
+nav .inner{display:flex;background:var(--card);border-radius:24px;padding:8px;gap:2px;
+  box-shadow:0 10px 34px rgba(60,44,150,.20);pointer-events:auto;width:100%;max-width:420px}
+body.dark nav .inner{box-shadow:0 10px 34px rgba(0,0,0,.5)}
+nav .n{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 2px;
+  color:var(--muted);font-size:9.5px;font-weight:700;border-radius:17px;transition:background .2s,color .2s}
+nav .n.on{background:var(--lav);color:var(--violet)}
+nav .n svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+
+/* ============ charts ============ */
+.chart{width:100%;display:block;overflow:visible}
+.chart text{font-size:10px;fill:var(--muted);font-weight:650}
+.vcard .chart text{fill:rgba(255,255,255,.7)}
+.gauge{position:relative;display:flex;align-items:center;justify-content:center}
+.gauge .lb{position:absolute;text-align:center}
+.stat{background:var(--card);border-radius:var(--r2);padding:15px 10px;text-align:center;box-shadow:var(--sh)}
+.stat b{display:block;font-size:21px;font-weight:800;letter-spacing:-.8px}
+.stat span{font-size:10.5px;color:var(--muted);font-weight:650}
+.stat .dl{font-size:10.5px;font-weight:700;margin-top:4px}
+.up{color:var(--coral)}.down{color:var(--mint)}
+.empty{text-align:center;padding:40px 16px;color:var(--muted);font-size:13.5px;font-weight:500}
+.empty .b{font-size:38px;margin-bottom:10px;opacity:.4}
+.toast{position:fixed;bottom:104px;left:50%;transform:translateX(-50%);background:var(--ink);
+  color:var(--bg);padding:13px 22px;border-radius:99px;font-size:13.5px;font-weight:650;z-index:200;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);animation:up .22s;max-width:88%;text-align:center}
+.ing{list-style:none}
+.ing li{padding:11px 0;font-size:14px;display:flex;justify-content:space-between;gap:14px;font-weight:550}
+.ing li + li{border-top:1px solid var(--line)}
+.ing li span{color:var(--muted);flex-shrink:0;font-weight:600}
+ol.st{padding-left:0;list-style:none;counter-reset:s}
+ol.st li{counter-increment:s;position:relative;padding-left:38px;margin-bottom:15px;font-size:13.8px;font-weight:520}
+ol.st li:last-child{margin-bottom:0}
+ol.st li:before{content:counter(s);position:absolute;left:0;top:-1px;width:26px;height:26px;
+  border-radius:9px;background:var(--lav);color:var(--violet);font-size:12px;font-weight:750;
+  display:flex;align-items:center;justify-content:center}
+.dots{display:flex;gap:6px;align-items:center}
+.dots i{height:7px;border-radius:99px;background:var(--line);transition:width .3s,background .3s}
+
+/* ======================= RESPONSIVE ======================= */
+.chips::-webkit-scrollbar,.week::-webkit-scrollbar{display:none}
+.chips,.week{scrollbar-width:none;-webkit-overflow-scrolling:touch}
+img,svg{max-width:100%}
+
+/* --- small phones (iPhone SE, 320-359px) --- */
+@media (max-width:359px){
+  .vh{padding-left:15px;padding-right:15px}
+  .sheet-b,.wrap{padding-left:14px;padding-right:14px}
+  .c{padding:16px;border-radius:22px}
+  h1.big{font-size:23px}
+  .tile{width:44px;height:44px;border-radius:14px;font-size:20px}
+  .tile.s{width:38px;height:38px;border-radius:12px;font-size:17px}
+  .g3{gap:7px}
+  .stat{padding:12px 6px}
+  .stat b{font-size:18px}
+  .rgrid{gap:10px}
+  .rcard .th{height:74px;font-size:32px}
+  nav .n{font-size:9px}
+  nav .n svg{width:19px;height:19px}
+  .btn{padding:14px 14px;font-size:14.5px}
+  .wd .n{font-size:14px}
+}
+
+/* --- standard phones --- */
+@media (min-width:360px) and (max-width:479px){
+  .rcard .th{height:84px}
+}
+
+/* --- large phones & small tablets --- */
+@media (min-width:560px){
+  .rgrid{grid-template-columns:repeat(3,1fr)}
+  h1.big{font-size:30px}
+  .vh{padding-left:26px;padding-right:26px;padding-top:calc(24px + env(safe-area-inset-top))}
+  .sheet-b,.wrap{padding-left:26px;padding-right:26px}
+}
+
+/* --- tablet / desktop: present the app in a device-like frame --- */
+@media (min-width:760px){
+  body{background:#E9E7F6;padding:28px 0}
+  body.dark{background:#0A0918}
+  #app{max-width:520px;background:var(--bg);border-radius:38px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(60,44,150,.22);min-height:auto;
+    padding-bottom:110px;position:relative}
+  body.dark #app{box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .vh{border-radius:38px 38px 0 0}
+  nav{position:sticky;bottom:0;margin-top:-96px;padding-bottom:18px}
+  nav .inner{max-width:390px}
+  .ovl{align-items:center}
+  .sh{max-width:520px;border-radius:30px;max-height:86vh}
+}
+@media (min-width:760px) and (max-height:720px){
+  body{padding:0}
+  #app{border-radius:0}
+  .vh{border-radius:0}
+}
+
+/* --- landscape phones: shorter headers so content still fits --- */
+@media (max-height:520px) and (orientation:landscape){
+  .vh{padding-top:14px;padding-bottom:24px}
+  h1.big{font-size:21px}
+  .gauge{transform:scale(.85);transform-origin:center}
+}
+
+/* --- accessibility --- */
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+@media (prefers-color-scheme:dark){
+  body.auto-dark{--violet:#8B7BF5;--bg:#100E22;--card:#191634;--ink:#EDEBFA;--line:#252044}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<nav id="nav"></nav>
+<div id="modal"></div>
+<script>
+
+/* =========================================================================
+   Healthy, protein-forward halal recipes built on ingredients available in
+   Pakistani markets. Grilled, baked, steamed and lightly sautéed only —
+   nothing deep-fried, no heavy slow-cooked fat bombs.
+   Macros are stored as protein/carbs/fat (g); calories are DERIVED with the
+   4/4/9 Atwater factors so the two can never disagree.
+   ========================================================================= */
+const R = (n,e,t,p,c,f,min,veg,tags,ing,st) => ({n,e,t,p,c,f,min,veg,tags,ing,st});
+
+const RECIPES = [
+/* ---------------------------- BREAKFAST ---------------------------- */
+R("Egg White & Spinach Omelette","🍳",["breakfast"],24,5,9,12,false,["high-protein","low-carb","under-15-min"],
+ [["Egg whites","5"],["Whole egg","1"],["Spinach, chopped","2 cups"],["Onion","2 tbsp"],["Olive oil","1 tsp"],["Black pepper, salt","to taste"]],
+ ["Wilt the spinach and onion in a non-stick pan with the oil.","Whisk the whites with the whole egg and season.","Pour over the greens, cook on low until just set — do not brown it."]),
+
+R("Masala Omelette","🍳",["breakfast"],15,5,13,10,false,["quick","low-carb"],
+ [["Egg","2"],["Tomato, onion","1/4 cup"],["Green chilli","1"],["Coriander","1 tbsp"],["Olive oil","1 tsp"]],
+ ["Whisk eggs with the chopped vegetables and seasoning.","Cook 2 minutes per side in a lightly oiled non-stick pan.","Serve with one whole-wheat roti if you need the carbs."]),
+
+R("Greek Yogurt Protein Bowl","🥣",["breakfast","snack"],26,26,6,5,true,["high-protein","no-cook","gut-health"],
+ [["Greek or hung yogurt","250 g"],["Banana or berries","1 cup"],["Chia seeds","1 tbsp"],["Almonds, slivered","10"],["Honey","1 tsp"]],
+ ["Spoon the yogurt into a bowl.","Top with fruit, chia and almonds, then drizzle honey.","Let it sit 5 minutes so the chia softens."]),
+
+R("Overnight Protein Oats","🥛",["breakfast"],28,48,9,5,true,["high-protein","meal-prep","high-fibre"],
+ [["Rolled oats","50 g"],["Milk","250 ml"],["Whey protein","1 scoop"],["Chia seeds","1 tbsp"],["Banana","1/2"]],
+ ["Stir oats, milk, protein and chia together in a jar.","Refrigerate overnight.","Top with banana in the morning — no cooking needed."]),
+
+R("Besan Cheela with Yogurt","🥞",["breakfast"],17,30,8,15,true,["vegetarian","high-fibre","budget"],
+ [["Gram flour (besan)","1/2 cup"],["Onion, tomato, coriander","1/2 cup"],["Green chilli","1"],["Olive oil","1 tsp"],["Plain yogurt","1/2 cup"]],
+ ["Whisk besan with water to a pourable batter and fold in the vegetables.","Spread thin on a hot non-stick tawa.","Cook 2 minutes per side with minimal oil; serve with yogurt."]),
+
+R("Anda Bhurji (light)","🍳",["breakfast"],21,7,13,12,false,["high-protein","low-carb","quick"],
+ [["Egg","3 (one yolk removed)"],["Onion, tomato","1/2 cup"],["Green chilli","1"],["Olive oil","1 tsp"],["Turmeric, salt","to taste"]],
+ ["Soften onion and tomato in a teaspoon of oil.","Add the eggs and scramble on low heat.","Finish with coriander and eat straight away."]),
+
+R("Boiled Eggs & Wheat Toast","🥚",["breakfast"],18,26,10,10,false,["budget","quick","high-protein"],
+ [["Egg","3 (one yolk removed)"],["Whole wheat bread","2 slices"],["Tomato, cucumber","1 cup"],["Black pepper","to taste"]],
+ ["Boil the eggs 8 minutes and cool them in cold water.","Toast the bread dry — no butter needed.","Season and serve with sliced salad vegetables."]),
+
+R("Savoury Oats Chilla","🥞",["breakfast"],16,40,8,18,true,["vegetarian","high-fibre"],
+ [["Oats, blended","50 g"],["Yogurt","1/4 cup"],["Carrot, capsicum, onion","1 cup"],["Green chilli","1"],["Olive oil","1 tsp"]],
+ ["Blend oats to a coarse flour and whisk with yogurt and water.","Fold in the grated vegetables.","Cook like a pancake, 3 minutes per side, on low-medium heat."]),
+
+R("Protein Chana Chaat","🥗",["breakfast","snack"],15,36,5,15,true,["vegetarian","high-fibre","budget"],
+ [["Boiled white chana","1.5 cups"],["Onion, tomato, cucumber","1 cup"],["Lemon juice","2 tbsp"],["Chaat masala","1 tsp"],["Coriander, mint","handful"]],
+ ["Toss the boiled chana with all the chopped vegetables.","Dress with lemon and chaat masala — skip the sweet chutney.","Chill 10 minutes before eating."]),
+
+R("Banana Peanut Protein Smoothie","🥤",["breakfast","snack"],30,40,9,5,true,["post-workout","high-protein"],
+ [["Whey protein","1 scoop"],["Banana","1"],["Milk","300 ml"],["Peanut butter","1 tsp"],["Ice","4 cubes"]],
+ ["Blend everything until completely smooth.","Drink within 30 minutes of training for best effect."]),
+
+R("Paneer Bhurji","🧀",["breakfast","dinner"],23,9,15,15,true,["vegetarian","high-protein","low-carb"],
+ [["Paneer, crumbled","150 g"],["Onion, tomato","1/2 cup"],["Capsicum","1/2"],["Olive oil","1 tsp"],["Turmeric, chilli","to taste"]],
+ ["Sauté onion, tomato and capsicum until soft.","Add the crumbled paneer and spices.","Toss 3 minutes — do not overcook or it turns rubbery."]),
+
+R("Sprouted Moong & Egg Salad","🌱",["breakfast","lunch"],19,24,7,15,false,["high-fibre","gut-health"],
+ [["Sprouted moong","1.5 cups"],["Boiled egg","2"],["Tomato, cucumber, onion","1 cup"],["Lemon, black pepper","to taste"],["Olive oil","1 tsp"]],
+ ["Steam the sprouts 3 minutes to make them easier to digest.","Toss with the chopped salad and dressing.","Top with quartered boiled eggs."]),
+
+/* ------------------------- LUNCH / DINNER -------------------------- */
+R("Grilled Chicken Tikka with Salad","🍗",["lunch","dinner"],42,7,10,35,false,["high-protein","low-carb","grill","fat-loss"],
+ [["Chicken breast","250 g"],["Yogurt","3 tbsp"],["Tikka masala","1 tbsp"],["Lemon","1/2"],["Kachumbar salad","2 cups"]],
+ ["Score the breast and marinate in yogurt, masala and lemon for 2 hours.","Grill or air-fry at 200°C for 18-20 minutes, turning once.","Rest 5 minutes and serve on a big salad with mint raita."]),
+
+R("Chicken Boti Skewers","🍢",["lunch","dinner"],40,5,11,35,false,["high-protein","low-carb","grill"],
+ [["Chicken breast, cubed","240 g"],["Yogurt","3 tbsp"],["Ginger-garlic","1 tsp"],["Boti masala","1 tbsp"],["Olive oil","1 tsp"]],
+ ["Marinate the cubes for at least 2 hours.","Thread onto skewers with onion and capsicum.","Grill on high heat until charred at the edges, about 12 minutes."]),
+
+R("Tandoori Chicken Breast","🔥",["lunch","dinner"],44,4,9,40,false,["high-protein","low-carb","fat-loss"],
+ [["Chicken breast","250 g"],["Hung yogurt","3 tbsp"],["Tandoori masala","1 tbsp"],["Lemon","1/2"],["Kasuri methi","1 tsp"]],
+ ["Marinate deeply scored breast for 3 hours.","Bake at 220°C for 22 minutes, then grill 3 minutes to char.","Finish with lemon and sliced onion."]),
+
+R("Chicken Shorba","🍲",["lunch","dinner"],27,9,6,30,false,["light","low-carb","comfort"],
+ [["Chicken, bone-in","200 g"],["Onion, tomato","1 each"],["Ginger, garlic","1 tbsp"],["Coriander, mint","handful"],["Olive oil","1 tsp"]],
+ ["Simmer the chicken with onion, ginger and garlic in 3 cups water.","Add tomato and spices, cook 20 minutes.","Strain if you like it clear; finish with coriander and lemon."]),
+
+R("Grilled Fish with Lemon","🐟",["lunch","dinner"],34,3,11,25,false,["high-protein","omega-3","low-carb"],
+ [["Rahu or salmon fillet","180 g"],["Lemon","1"],["Garlic, crushed","2 cloves"],["Olive oil","1 tsp"],["Black pepper, ajwain","to taste"]],
+ ["Marinate the fillet in lemon, garlic and pepper for 20 minutes.","Grill 4-5 minutes per side on a hot pan.","Serve with steamed greens."]),
+
+R("Fish Tikka","🐟",["lunch","dinner"],36,5,10,30,false,["high-protein","omega-3","grill"],
+ [["Firm white fish","200 g"],["Yogurt","2 tbsp"],["Tikka masala","1 tbsp"],["Lemon","1/2"],["Capsicum, onion","1 cup"]],
+ ["Cube the fish and marinate 30 minutes — no longer, or it breaks down.","Skewer with capsicum and onion.","Grill 8-10 minutes, turning gently."]),
+
+R("Chicken & Vegetable Stir Fry","🥘",["lunch","dinner"],38,18,10,20,false,["high-protein","quick","fat-loss"],
+ [["Chicken breast, sliced","220 g"],["Capsicum, carrot, beans, cabbage","3 cups"],["Soy sauce, vinegar","1 tbsp"],["Garlic","3 cloves"],["Olive oil","2 tsp"]],
+ ["Get the pan properly hot before anything goes in.","Sear the chicken 4 minutes until browned, then set aside.","Toss vegetables 3 minutes so they stay crunchy, return chicken, add sauces."]),
+
+R("Chicken with Brown Rice & Veg","🍚",["lunch","dinner"],36,48,10,35,false,["balanced","meal-prep","high-protein"],
+ [["Chicken breast","200 g"],["Brown rice","1/2 cup dry"],["Broccoli or beans","2 cups"],["Olive oil","2 tsp"],["Garlic, pepper","to taste"]],
+ ["Cook the brown rice ahead — it keeps three days in the fridge.","Grill the seasoned chicken and slice it.","Steam the greens and plate all three together."]),
+
+R("Palak Chicken","🥬",["lunch","dinner"],38,12,13,40,false,["high-protein","low-carb","iron-rich"],
+ [["Chicken breast","220 g"],["Spinach","400 g"],["Onion","1 small"],["Green chilli","2"],["Olive oil","2 tsp"]],
+ ["Blanch the spinach 2 minutes and blend coarsely — keeps the colour.","Cook chicken with onion, ginger-garlic and spices.","Fold in the spinach and simmer 10 minutes."]),
+
+R("Lean Chicken Karahi","🍗",["lunch","dinner"],40,11,16,35,false,["high-protein","classic-lightened"],
+ [["Chicken breast, cubed","250 g"],["Tomato","3"],["Green chilli","4"],["Ginger-garlic","1 tbsp"],["Olive oil","2 tsp"]],
+ ["Use two teaspoons of oil, not the usual half cup — that's the whole trick.","Sear chicken, add ginger-garlic, then tomatoes.","Bhunno on high until the tomatoes collapse; finish with ginger and coriander."]),
+
+R("Baked Chapli Kabab","🍔",["lunch","dinner"],29,9,14,30,false,["high-protein","baked"],
+ [["Lean beef mince","180 g"],["Tomato","1"],["Coriander seed, crushed","1 tbsp"],["Egg white","1"],["Oats flour","1 tbsp"]],
+ ["Mix mince with tomato, crushed coriander, egg white and oat flour.","Shape flat patties and place on a lined tray.","Bake at 200°C for 18 minutes, flipping once — no frying."]),
+
+R("Baked Seekh Kabab","🍢",["lunch","dinner"],31,5,13,35,false,["high-protein","low-carb","baked"],
+ [["Lean beef mince","180 g"],["Onion, mint, coriander","3 tbsp"],["Ginger-garlic","1 tsp"],["Kabab masala","1 tbsp"],["Olive oil","1 tsp"]],
+ ["Knead the mince with seasonings until sticky, then chill 30 minutes.","Press onto skewers.","Bake at 220°C for 15 minutes, then grill 3 minutes to colour."]),
+
+R("Chicken Yakhni Pulao (brown rice)","🍚",["lunch","dinner"],32,52,11,45,false,["balanced","classic-lightened"],
+ [["Chicken","200 g"],["Brown rice","1/2 cup dry"],["Whole spices","1 tbsp"],["Onion","1 small"],["Olive oil","2 tsp"]],
+ ["Boil the chicken with whole spices to make yakhni; strain and keep the stock.","Lightly brown the onion in two teaspoons of oil.","Add soaked brown rice and measured yakhni, cook covered until absorbed.","Rest 10 minutes off the heat before fluffing."]),
+
+R("Masoor Daal with Brown Rice","🍛",["lunch","dinner"],18,66,7,35,true,["vegetarian","budget","high-fibre"],
+ [["Masoor daal","3/4 cup"],["Brown rice","1/2 cup dry"],["Garlic","4 cloves"],["Cumin","1 tsp"],["Olive oil","2 tsp"]],
+ ["Boil the daal with turmeric until creamy.","Make a light tarka of cumin and garlic in two teaspoons of oil.","Serve over brown rice with a side salad."]),
+
+R("Chana Daal with Chicken","🍛",["lunch","dinner"],33,40,10,50,false,["high-protein","high-fibre"],
+ [["Chana daal","1/2 cup"],["Chicken breast","180 g"],["Onion, tomato","1 each"],["Ginger-garlic","1 tbsp"],["Olive oil","2 tsp"]],
+ ["Soak the daal 30 minutes, then boil until tender but still holding shape.","Cook the chicken with onion, tomato and ginger-garlic.","Combine and simmer 10 minutes so the flavours meet."]),
+
+R("Rajma with Brown Rice","🫘",["lunch","dinner"],18,70,7,50,true,["vegetarian","high-fibre","budget"],
+ [["Red kidney beans","3/4 cup"],["Brown rice","1/2 cup dry"],["Onion, tomato","1 each"],["Olive oil","2 tsp"],["Ginger-garlic","1 tsp"]],
+ ["Soak the rajma overnight, then pressure cook until completely soft.","Bhunno a light onion-tomato masala.","Mash a few beans to thicken naturally instead of adding cream."]),
+
+R("Lobia Salad Bowl","🥗",["lunch","dinner"],17,44,6,25,true,["vegetarian","high-fibre","no-cook"],
+ [["Boiled black-eyed peas","1.5 cups"],["Cucumber, tomato, onion","2 cups"],["Lemon juice","2 tbsp"],["Olive oil","1 tsp"],["Mint, coriander","handful"]],
+ ["Toss the boiled lobia with all the chopped vegetables.","Dress with lemon, olive oil, salt and pepper.","Rest 10 minutes so it takes on the dressing."]),
+
+R("Chickpea & Chicken Salad","🥗",["lunch","dinner"],37,34,9,20,false,["high-protein","high-fibre","meal-prep"],
+ [["Grilled chicken breast","180 g"],["Boiled chana","1 cup"],["Cucumber, tomato, onion","2 cups"],["Yogurt dressing","3 tbsp"],["Lemon, pepper","to taste"]],
+ ["Dice the grilled chicken.","Combine with chana and chopped vegetables.","Fold through a yogurt-lemon dressing instead of mayo."]),
+
+R("Beef Steak with Sautéed Veg","🥩",["lunch","dinner"],42,10,16,25,false,["high-protein","low-carb","iron-rich"],
+ [["Lean beef undercut","200 g"],["Broccoli, beans, capsicum","2.5 cups"],["Garlic","3 cloves"],["Olive oil","2 tsp"],["Black pepper","to taste"]],
+ ["Bring the steak to room temperature and season it well.","Sear 3-4 minutes per side, then rest 5 minutes before slicing.","Sauté the vegetables in the same pan with garlic."]),
+
+R("Lean Keema with Peas","🍛",["lunch","dinner"],34,14,14,30,false,["high-protein","quick"],
+ [["Lean beef mince","180 g"],["Green peas","3/4 cup"],["Onion, tomato","1 each"],["Olive oil","2 tsp"],["Garam masala","1 tsp"]],
+ ["Brown the mince first and drain off any rendered fat.","Add onion, tomato and spices, bhunno until dry.","Stir in peas and cook 8 minutes more."]),
+
+R("Paneer Tikka","🧀",["lunch","dinner"],27,11,18,30,true,["vegetarian","high-protein","grill"],
+ [["Paneer","150 g"],["Hung yogurt","3 tbsp"],["Tikka masala","1 tbsp"],["Capsicum, onion","1.5 cups"],["Olive oil","1 tsp"]],
+ ["Marinate paneer cubes and vegetables together for 1 hour.","Skewer alternately.","Grill 8 minutes, turning, until the edges catch colour."]),
+
+R("Egg Curry (light)","🍛",["lunch","dinner"],19,11,14,25,false,["budget","quick"],
+ [["Egg","3 (one yolk removed)"],["Onion, tomato","1 each"],["Ginger-garlic","1 tsp"],["Olive oil","2 tsp"],["Yogurt","2 tbsp"]],
+ ["Boil the eggs and halve them.","Cook an onion-tomato masala in two teaspoons of oil.","Whisk in yogurt off the heat, add eggs and simmer 5 minutes."]),
+
+R("Grilled Chicken Wrap","🌯",["lunch","dinner"],36,38,11,25,false,["high-protein","portable"],
+ [["Chicken breast","200 g"],["Whole wheat tortilla or roti","1"],["Cabbage, cucumber, tomato","1.5 cups"],["Yogurt-garlic sauce","2 tbsp"],["Lemon, pepper","to taste"]],
+ ["Marinate and grill the chicken, then slice thin.","Warm the wrap on a dry tawa.","Layer chicken, plenty of salad and yogurt sauce, then roll tight."]),
+
+R("Chicken Salad Sandwich","🥪",["lunch","snack"],32,34,9,15,false,["quick","high-protein","office"],
+ [["Grilled chicken breast","170 g"],["Whole wheat bread","2 slices"],["Greek yogurt","2 tbsp"],["Lettuce, tomato, onion","1.5 cups"],["Mustard, pepper","to taste"]],
+ ["Shred the chicken and mix with yogurt and mustard.","Pile onto toasted wholemeal with plenty of salad.","Press briefly on a hot pan if you want it warm."]),
+
+R("Lauki Chicken Curry","🥒",["lunch","dinner"],35,13,11,40,false,["low-carb","light","high-protein"],
+ [["Chicken breast","200 g"],["Bottle gourd (lauki)","400 g"],["Onion, tomato","1 each"],["Olive oil","2 tsp"],["Ginger-garlic","1 tsp"]],
+ ["Cook chicken with onion, tomato and ginger-garlic until sealed.","Add cubed lauki and half a cup of water.","Cover and simmer 20 minutes until the gourd is tender."]),
+
+R("Bhindi with Grilled Chicken","🥒",["lunch","dinner"],36,15,12,35,false,["low-carb","high-protein"],
+ [["Okra (bhindi)","300 g"],["Chicken breast","200 g"],["Onion, tomato","1 each"],["Olive oil","2 tsp"]],
+ ["Dry-roast the okra in a hot pan first — this removes the sliminess without deep frying.","Grill and slice the chicken separately.","Combine with a light onion-tomato masala."]),
+
+R("Tofu & Vegetable Stir Fry","🥦",["lunch","dinner"],23,22,12,20,true,["vegetarian","high-protein","quick"],
+ [["Firm tofu","200 g"],["Broccoli, capsicum, carrot","3 cups"],["Soy sauce, vinegar","1 tbsp"],["Garlic, ginger","1 tbsp"],["Sesame oil","2 tsp"]],
+ ["Press the tofu 15 minutes to remove water, then cube it.","Sear until golden on all sides, remove.","Stir fry the vegetables hot and fast, return tofu, add sauce."]),
+
+R("Daal Shorba","🍲",["lunch","dinner","snack"],17,34,5,30,true,["vegetarian","light","budget"],
+ [["Mixed daal","1/2 cup"],["Onion, garlic, tomato","1 cup"],["Cumin","1 tsp"],["Olive oil","1 tsp"],["Lemon","1/2"]],
+ ["Boil the daal with turmeric until it falls apart.","Blend smooth and thin with water to a soup.","Temper cumin and garlic in a teaspoon of oil, pour over, finish with lemon."]),
+
+R("Chicken Corn Soup","🥣",["lunch","dinner","snack"],23,20,4,25,false,["light","low-fat","comfort"],
+ [["Chicken breast, shredded","130 g"],["Sweet corn","1/2 cup"],["Cornflour","1.5 tbsp"],["Egg white","2"],["Chicken stock","3 cups"]],
+ ["Simmer stock with the shredded chicken and corn.","Thicken with a cornflour slurry.","Stream in the egg whites while stirring; season with white pepper and vinegar."]),
+
+R("Prawn Karahi","🦐",["lunch","dinner"],30,9,10,25,false,["high-protein","low-carb","quick"],
+ [["Prawns, peeled","250 g"],["Tomato","2"],["Green chilli","3"],["Ginger-garlic","1 tbsp"],["Olive oil","2 tsp"]],
+ ["Cook the tomato masala first — prawns need only minutes.","Add prawns and toss 4-5 minutes until just opaque.","Overcooking makes them rubbery, so pull them early."]),
+
+R("Baked Fish with Vegetables","🐟",["lunch","dinner"],35,15,10,35,false,["omega-3","balanced","one-tray"],
+ [["Fish fillet","200 g"],["Capsicum, courgette, tomato","2.5 cups"],["Lemon","1"],["Olive oil","2 tsp"],["Garlic, herbs","to taste"]],
+ ["Toss the vegetables with oil and spread on a tray.","Lay the seasoned fillet on top with lemon slices.","Bake at 200°C for 20 minutes — one tray, no mess."]),
+
+R("Chicken Meatballs in Tomato","🍅",["lunch","dinner"],35,13,13,35,false,["high-protein","meal-prep"],
+ [["Chicken mince","200 g"],["Oats flour","2 tbsp"],["Egg white","1"],["Tomato, blended","3"],["Olive oil","2 tsp"]],
+ ["Mix mince with oat flour, egg white, garlic and herbs; roll into balls.","Bake at 200°C for 15 minutes instead of frying.","Simmer in the tomato sauce for 10 minutes."]),
+
+R("Quinoa Chicken Bowl","🥗",["lunch","dinner"],37,42,11,30,false,["balanced","high-protein","meal-prep"],
+ [["Chicken breast","200 g"],["Quinoa","1/2 cup dry"],["Cucumber, tomato, onion","2 cups"],["Olive oil, lemon","2 tsp"],["Feta or paneer","20 g"]],
+ ["Rinse quinoa well, then simmer 15 minutes and fluff.","Grill and slice the chicken.","Build the bowl and dress with lemon and olive oil."]),
+
+R("Sabzi, Daal & Roti","🥕",["lunch","dinner"],19,50,9,35,true,["vegetarian","budget","balanced"],
+ [["Mixed vegetables","300 g"],["Masoor daal","1/2 cup"],["Whole wheat roti","1"],["Olive oil","2 tsp"],["Cumin, turmeric","1 tsp"]],
+ ["Boil the daal with turmeric and a light garlic tarka.","Cook the vegetables covered with minimal water so they steam.","Serve both with one whole-wheat roti."]),
+
+R("Soya Chunk Curry","🌾",["lunch","dinner"],31,26,9,30,true,["vegetarian","high-protein","budget"],
+ [["Soya chunks","70 g dry"],["Onion, tomato","1 each"],["Ginger-garlic","1 tsp"],["Olive oil","2 tsp"],["Yogurt","2 tbsp"]],
+ ["Soak the soya chunks in hot water 10 minutes, then squeeze them dry.","Cook an onion-tomato masala and add the chunks.","Simmer 15 minutes so they soak up the gravy."]),
+
+R("Grilled Chicken Salad","🥗",["lunch","dinner"],38,12,12,25,false,["high-protein","low-carb","fat-loss"],
+ [["Chicken breast","200 g"],["Lettuce, cucumber, tomato","3 cups"],["Greek yogurt","3 tbsp"],["Garlic, mustard, lemon","to taste"],["Olive oil","1 tsp"]],
+ ["Grill the seasoned breast and rest before slicing.","Whisk yogurt, garlic, mustard and lemon into a creamy dressing.","Toss everything together just before eating so it stays crisp."]),
+
+/* ------------------------------ SNACKS ----------------------------- */
+R("Whey Protein Shake","🥤",["snack"],26,6,2,3,true,["post-workout","high-protein","quick"],
+ [["Whey protein","1 scoop"],["Water or skim milk","300 ml"]],
+ ["Shake with liquid for 20 seconds.","Best taken within 30 minutes of training."]),
+
+R("Greek Yogurt with Berries","🍓",["snack"],18,18,4,3,true,["high-protein","gut-health","no-cook"],
+ [["Greek yogurt","180 g"],["Berries or apple","3/4 cup"],["Cinnamon","a pinch"]],
+ ["Spoon yogurt into a bowl and top with fruit.","Dust with cinnamon — no sugar needed."]),
+
+R("Two Boiled Eggs","🥚",["snack"],13,1,10,10,false,["high-protein","low-carb","budget"],
+ [["Egg","2"],["Black pepper, salt","to taste"]],
+ ["Boil 8 minutes, cool in cold water and peel.","Season and eat — the simplest protein there is."]),
+
+R("Roasted Chana","🫛",["snack"],10,28,3,2,true,["budget","high-fibre","office"],
+ [["Roasted chana","50 g"]],
+ ["Weigh out 50 g — it is easy to eat far more than you think.","Eat slowly with tea."]),
+
+R("Almonds & Walnuts","🥜",["snack"],6,5,13,1,true,["healthy-fats","brain-food"],
+ [["Almonds","15"],["Walnut halves","4"]],
+ ["Soak the almonds overnight if you find them heavy.","Portion them out — nuts are very calorie dense."]),
+
+R("Paneer Cubes with Chaat Masala","🧀",["snack"],19,4,13,5,true,["vegetarian","high-protein","low-carb"],
+ [["Paneer","120 g"],["Chaat masala","1 tsp"],["Lemon","1/2"]],
+ ["Cube the paneer and sear it dry in a hot non-stick pan for colour.","Toss with chaat masala and lemon."]),
+
+R("Protein Lassi (no sugar)","🥛",["snack"],23,16,4,5,true,["high-protein","summer"],
+ [["Yogurt","1 cup"],["Whey protein","1/2 scoop"],["Milk","1/2 cup"],["Cardamom","a pinch"],["Ice","4 cubes"]],
+ ["Blend everything until frothy.","Skip the sugar — the protein powder is usually sweet enough."]),
+
+R("Apple with Peanut Butter","🍎",["snack"],9,30,9,3,true,["pre-workout","high-fibre"],
+ [["Apple","1 large"],["Peanut butter","1 tbsp"]],
+ ["Slice the apple.","Spread a level tablespoon of peanut butter — measure it, don't eyeball it."]),
+
+R("Sprouted Chana Chaat","🌱",["snack"],13,30,4,10,true,["vegetarian","high-fibre","gut-health"],
+ [["Sprouted chana","1 cup"],["Onion, tomato, cucumber","1 cup"],["Lemon, chaat masala","to taste"]],
+ ["Steam the sprouts 3 minutes.","Toss with chopped vegetables, lemon and chaat masala."]),
+
+R("Boiled Chicken Strips","🍗",["snack"],28,0,4,20,false,["high-protein","low-carb","meal-prep"],
+ [["Chicken breast","130 g"],["Salt, pepper, bay leaf","to taste"]],
+ ["Poach the breast in seasoned water for 15 minutes.","Cool, slice and keep in the fridge for grab-and-go protein."]),
+
+R("Steamed Edamame or Beans","🫛",["snack"],13,14,5,10,true,["vegetarian","high-fibre"],
+ [["Edamame or boiled beans","1 cup"],["Sea salt","a pinch"],["Chilli flakes","optional"]],
+ ["Steam 5 minutes.","Season lightly and eat warm."]),
+
+R("Fruit & Nut Bowl","🍇",["snack"],7,34,10,5,true,["light","no-cook"],
+ [["Apple, guava, orange","2 cups"],["Mixed nuts","15 g"],["Lemon, chaat masala","to taste"]],
+ ["Chop the fruit into a bowl.","Scatter the nuts and season with lemon and chaat masala."])
+];
+RECIPES.forEach((r,i)=>{r.id=i; r.k=Math.round(r.p*4+r.c*4+r.f*9);});
+
+/* Quick-add food database — values are per the stated serving. */
+const FOODS=[
+ ["Roti (whole wheat)","1 medium",4,25,3],["Naan","1",8,50,6],["Paratha","1",6,36,15],
+ ["Boiled rice","1 cup",4,45,1],["Biryani","1 plate",25,75,20],["Pulao","1 cup",8,42,9],
+ ["Chicken breast, cooked","100 g",31,0,4],["Chicken curry","1 cup",26,8,18],
+ ["Beef curry","1 cup",25,7,22],["Mutton karahi","1 cup",27,6,26],["Keema","1 cup",26,8,20],
+ ["Fried fish","100 g",22,6,12],["Egg, boiled","1",6,1,5],["Egg, fried","1",6,1,8],
+ ["Daal (any)","1 cup",9,28,5],["Chana chaat","1 cup",12,34,6],["Chole","1 cup",11,32,8],
+ ["Milk, full cream","1 cup",8,12,8],["Milk, skim","1 cup",8,12,0],["Yogurt, plain","1 cup",9,12,4],
+ ["Lassi, sweet","1 glass",8,38,7],["Chai with sugar","1 cup",3,14,4],["Chai, no sugar","1 cup",3,4,4],
+ ["Banana","1 medium",1,27,0],["Apple","1 medium",1,25,0],["Orange","1",1,15,0],
+ ["Mango","1 medium",2,50,1],["Dates","3",1,20,0],["Guava","1",2,14,1],
+ ["Almonds","10",3,2,6],["Peanuts","30 g",8,6,14],["Walnuts","4 halves",2,2,9],
+ ["Samosa","1",5,26,14],["Pakora","4 pieces",6,22,14],["Chips packet","small",2,15,10],
+ ["Biscuit (tea)","2",1,12,4],["Cake slice","1",4,38,14],["Gulab jamun","1",3,30,8],
+ ["Soft drink","300 ml",0,33,0],["Fresh juice","1 glass",1,26,0],["Water","1 glass",0,0,0],
+ ["Salad, kachumbar","1 bowl",2,8,0],["Raita","1/2 cup",4,6,3],["Achar","1 tbsp",0,1,4],
+ ["Whey protein","1 scoop",24,3,2],["Peanut butter","1 tbsp",4,3,8],["Olive oil","1 tsp",0,0,5],
+ ["Ghee","1 tsp",0,0,5],["Bread slice","1",3,14,1],["Oats","50 g dry",7,33,4],
+ ["Shawarma","1 roll",30,45,20],["Burger, beef","1",25,38,26],["Pizza slice","1",11,30,11],
+ ["French fries","medium",4,44,17],["Nihari","1 bowl",32,14,30],["Haleem","1 bowl",24,46,16],
+ ["Seekh kabab","1",13,3,9],["Chapli kabab","1",12,5,13],["Chicken tikka","1 piece",28,2,10]
+].map((x,i)=>({id:i,n:x[0],s:x[1],p:x[2],c:x[3],f:x[4],k:Math.round(x[2]*4+x[3]*4+x[4]*9)}));
+
+/* ============================ STATE ============================ */
+const KEY='nutriplan.v1';
+const blank=()=>({
+  profile:null,          // {name,sex,age,h,w,act,goal,rate,target}
+  log:{},                // 'YYYY-MM-DD' -> [{n,p,c,f,k,meal}]
+  weights:{},            // 'YYYY-MM-DD' -> kg
+  water:{}, steps:{},     // 'YYYY-MM-DD' -> number
+  plan:null,             // {start:'YYYY-MM-DD', days:[[recipeIds...]]}
+  prefs:{veg:false, dark:false, waterGoal:8, stepGoal:8000},
+  saved:[]               // saved recipe ids
+});
+let S = load();
+function load(){
+  try{ const r=JSON.parse(localStorage.getItem(KEY)); if(r&&typeof r==='object') return Object.assign(blank(),r);}catch(e){}
+  return blank();
+}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){ toast('Storage full'); } }
+
+/* ============================ HELPERS ============================ */
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>iso(new Date());
+const parseISO=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+const addDays=(s,n)=>{const d=parseISO(s);d.setDate(d.getDate()+n);return iso(d);};
+const DAYN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const kcal=(p,c,f)=>Math.round(p*4+c*4+f*9);
+
+let toastT;
+function toast(m){
+  clearTimeout(toastT);
+  document.querySelectorAll('.toast').forEach(e=>e.remove());
+  const d=document.createElement('div'); d.className='toast'; d.textContent=m;
+  document.body.appendChild(d); toastT=setTimeout(()=>d.remove(),1900);
+}
+
+/* ==================== NUTRITION CALCULATIONS ====================
+   BMR: Mifflin-St Jeor (1990) — the most accurate general equation.
+     men:   10w + 6.25h - 5a + 5
+     women: 10w + 6.25h - 5a - 161
+   TDEE = BMR x activity factor.
+   Deficit/surplus is capped so the plan never drops below a safe floor
+   (1200 kcal women / 1500 kcal men, per general clinical guidance).
+   ================================================================= */
+const ACT={
+  sed:{f:1.2,  l:'Sedentary',  d:'Desk job, little exercise'},
+  lite:{f:1.375,l:'Light',      d:'Light exercise 1-3 days/week'},
+  mod:{f:1.55, l:'Moderate',   d:'Exercise 3-5 days/week'},
+  high:{f:1.725,l:'Very active',d:'Hard exercise 6-7 days/week'},
+  ath:{f:1.9,  l:'Athlete',    d:'Physical job or 2x daily training'}
+};
+const GOALS={
+  loss:{l:'Fat loss',   e:'📉', d:'Lose fat, keep muscle', adj:-0.20, split:[0.35,0.35,0.30]},
+  maint:{l:'Maintain',  e:'⚖️', d:'Stay at current weight', adj:0,     split:[0.30,0.40,0.30]},
+  gain:{l:'Muscle gain',e:'💪', d:'Build lean mass',        adj:+0.15, split:[0.30,0.45,0.25]},
+  bulk:{l:'Weight gain',e:'📈', d:'Gain weight steadily',   adj:+0.25, split:[0.25,0.50,0.25]}
+};
+
+function bmr(p){
+  const base = 10*p.w + 6.25*p.h - 5*p.age;
+  return Math.round(p.sex==='m' ? base+5 : base-161);
+}
+function tdee(p){ return Math.round(bmr(p)*ACT[p.act].f); }
+function targets(p){
+  const t=tdee(p), g=GOALS[p.goal];
+  const floor = p.sex==='m' ? 1500 : 1200;
+  const cal = Math.max(floor, Math.round((t*(1+g.adj))/10)*10);
+  const [pp,cp,fp]=g.split;
+  // Protein floor of 1.6 g/kg for anyone training or losing fat.
+  let prot = Math.round(cal*pp/4);
+  const minP = Math.round(p.w*(p.goal==='maint'?1.2:1.6));
+  if(prot<minP) prot=minP;
+  let fat = Math.round(cal*fp/9);
+  let carb = Math.round((cal - prot*4 - fat*9)/4);
+  if(carb<50){ carb=50; fat=Math.max(30,Math.round((cal-prot*4-carb*4)/9)); }
+  return {cal, p:prot, c:carb, f:fat, tdee:t, bmr:bmr(p)};
+}
+function bmi(p){ const m=p.h/100; return +(p.w/(m*m)).toFixed(1); }
+function bmiBand(v){
+  if(v<18.5) return ['Underweight','var(--c)'];
+  if(v<25)   return ['Healthy','var(--brand)'];
+  if(v<30)   return ['Overweight','var(--c)'];
+  return ['Obese','var(--danger)'];
+}
+/* Rough weekly change: 7700 kcal ~= 1 kg of body mass. */
+function weeklyChange(p){
+  const t=targets(p);
+  return +(((t.cal - t.tdee)*7)/7700).toFixed(2);
+}
+
+/* ======================= DAY TOTALS ======================= */
+function dayTotal(d){
+  const rows=S.log[d]||[];
+  return rows.reduce((a,x)=>({p:a.p+x.p,c:a.c+x.c,f:a.f+x.f,k:a.k+x.k}),{p:0,c:0,f:0,k:0});
+}
+function T(){ return S.profile? targets(S.profile) : {cal:2000,p:150,c:200,f:67}; }
+
+/* ==================== MEAL PLAN GENERATOR ====================
+   Greedy fit: each meal slot gets a share of the day's calories, then a
+   recipe is chosen by (a) how close it lands to that slot's calories and
+   (b) how recently it was used, so the week doesn't repeat itself.
+   Serving size is then scaled (0.5x-2x) to close the remaining gap.
+   ============================================================== */
+const SLOTS=[
+  {k:'breakfast',l:'Breakfast',share:.25},
+  {k:'lunch',    l:'Lunch',    share:.35},
+  {k:'snack',    l:'Snack',    share:.10},
+  {k:'dinner',   l:'Dinner',   share:.30}
+];
+
+function generatePlan(){
+  const t=T(), veg=S.prefs.veg;
+  const used={};                      // recipeId -> last day index used
+  const days=[];
+  for(let d=0; d<7; d++){
+    const meals=[];
+    for(const sl of SLOTS){
+      const want=t.cal*sl.share;
+      const pool=RECIPES.filter(r=>r.t.includes(sl.k) && (!veg || r.veg));
+      let best=null,bestScore=1e9;
+      for(const r of pool){
+        const gap=Math.abs(r.k-want)/want;
+        const last=used[r.id];
+        const recency = last===undefined ? 0 : Math.max(0,(4-(d-last)))*0.55;
+        const jitter=Math.random()*0.18;
+        const sc=gap+recency+jitter;
+        if(sc<bestScore){bestScore=sc;best=r;}
+      }
+      if(!best) continue;
+      used[best.id]=d;
+      let serv=clamp(Math.round((want/best.k)*4)/4, .5, 2);
+      meals.push({id:best.id, slot:sl.k, serv});
+    }
+    balanceDay(meals,t.cal);
+    // Big surplus targets can't be met with four capped servings — add a
+    // second snack rather than serving someone an implausible 3x portion.
+    for(let extra=0; extra<3 && t.cal-planDayTotals(meals).k>200; extra++){
+      const pool=RECIPES.filter(r=>r.t.includes('snack')&&(!veg||r.veg)
+        &&!meals.some(m=>m.id===r.id));
+      if(!pool.length) break;
+      const gap=t.cal-planDayTotals(meals).k;
+      const pick=pool.reduce((a,b)=>Math.abs(b.k-gap)<Math.abs(a.k-gap)?b:a);
+      meals.splice(3,0,{id:pick.id,slot:'snack',serv:clamp(Math.round(gap/pick.k*4)/4,.5,2)});
+      balanceDay(meals,t.cal);
+    }
+    days.push(meals);
+  }
+  S.plan={start:today(),days}; save();
+}
+/* Nudge servings in 0.25 steps (never outside 0.5x-2x) until the day's
+   calories sit as close to target as the available dishes allow. */
+function balanceDay(meals,goal){
+  for(let pass=0; pass<24; pass++){
+    const gap=goal-planDayTotals(meals).k;
+    if(Math.abs(gap)<40) break;
+    const dir=gap>0?0.25:-0.25;
+    // adjust the meal whose 0.25 step best shrinks the gap
+    let pick=null,bestLeft=Math.abs(gap);
+    for(const m of meals){
+      const ns=+(m.serv+dir).toFixed(2);
+      if(ns<0.5||ns>2) continue;
+      const left=Math.abs(gap-dir*RECIPES[m.id].k);
+      if(left<bestLeft){bestLeft=left;pick=m;}
+    }
+    if(!pick) break;
+    pick.serv=+(pick.serv+dir).toFixed(2);
+  }
+}
+function planDayTotals(meals){
+  return meals.reduce((a,m)=>{const r=RECIPES[m.id];
+    return {p:a.p+r.p*m.serv,c:a.c+r.c*m.serv,f:a.f+r.f*m.serv,k:a.k+r.k*m.serv};},
+    {p:0,c:0,f:0,k:0});
+}
+
+
+/* ==================== HEIGHT: FEET & INCHES ====================
+   Height is entered and displayed in ft/in, but stored in centimetres
+   because Mifflin-St Jeor is defined in metric. One conversion point,
+   so rounding can't drift.
+   ================================================================ */
+const CM_PER_IN=2.54;
+function cmToFtIn(cm){
+  const totalIn=Math.round(cm/CM_PER_IN);
+  return {ft:Math.floor(totalIn/12), in:totalIn%12};
+}
+function ftInToCm(ft,inch){ return +(((+ft||0)*12+(+inch||0))*CM_PER_IN).toFixed(1); }
+function htLabel(cm){ const h=cmToFtIn(cm); return h.ft+"'"+h.in+'"'; }
+
+/* ==================== STORAGE DURABILITY ====================
+   localStorage survives closing the tab, closing the browser and
+   restarting the phone. It is only lost if site data is cleared, the
+   page is opened in a private window, or the browser evicts the origin
+   under storage pressure. persist() asks the browser not to evict.
+   ============================================================= */
+let storagePersisted=null;
+async function requestPersistence(){
+  try{
+    if(navigator.storage && navigator.storage.persist){
+      storagePersisted = await navigator.storage.persisted();
+      if(!storagePersisted) storagePersisted = await navigator.storage.persist();
+    }
+  }catch(e){ storagePersisted=null; }
+  return storagePersisted;
+}
+function storageWorks(){
+  try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }
+  catch(e){ return false; }
+}
+function importBackup(file){
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const data=JSON.parse(fr.result);
+      if(!data || typeof data!=='object' || !('log' in data))
+        return toast('That file is not a NutriPlan backup');
+      const days=Object.keys(data.log||{}).length;
+      if(!confirm('Restore this backup? It will replace your current data.\n\n'
+        +days+' logged day(s) in the file.')) return;
+      S=Object.assign(blank(),data); save();
+      document.body.classList.toggle('dark',!!S.prefs.dark);
+      closeModal(); toast('Backup restored'); render();
+    }catch(e){ toast('Could not read that file'); }
+  };
+  fr.readAsText(file);
+}
+/* Nudge for a backup if it has been a while and there is data worth keeping. */
+function backupDue(){
+  const n=Object.keys(S.log).length;
+  if(n<5) return false;
+  const last=S.prefs.lastBackup||0;
+  return (Date.now()-last) > 14*24*3600*1000;
+}
+/* ============================ SVG PRIMITIVES ============================ */
+function polar(cx,cy,r,deg){const a=(deg-90)*Math.PI/180;return[cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+function arcPath(cx,cy,r,s,e){
+  if(e-s<=0.01) return '';
+  const [x1,y1]=polar(cx,cy,r,s),[x2,y2]=polar(cx,cy,r,Math.min(e,s+359.99));
+  const large=(e-s)>180?1:0;
+  return `M${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+let uid=0; const nid=()=>'g'+(++uid);
+
+/* 270° gauge with a dotted inner track — the kit's signature component. */
+function gauge(pct,opts){
+  const o=Object.assign({size:196,icon:'🔥',big:'',small:'',c1:'var(--violet)',c2:'var(--violet-3)',over:false},opts);
+  const s=o.size, cx=s/2, cy=s/2, r=s/2-18, id=nid();
+  const p=clamp(pct,0,1), sweep=270*p;
+  return `<div class="gauge" style="width:${s}px;height:${s}px">
+    <svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
+      <defs><linearGradient id="${id}" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0" stop-color="${o.over?'var(--coral)':o.c1}"/>
+        <stop offset="1" stop-color="${o.over?'var(--amber)':o.c2}"/></linearGradient></defs>
+      <path d="${arcPath(cx,cy,r,225,495)}" stroke="var(--line)" stroke-width="13"
+        fill="none" stroke-linecap="round"/>
+      <path d="${arcPath(cx,cy,r-17,225,495)}" stroke="var(--line)" stroke-width="3.4"
+        fill="none" stroke-linecap="round" stroke-dasharray="0.1 8"/>
+      <path d="${arcPath(cx,cy,r,225,225+sweep)}" stroke="url(#${id})" stroke-width="13"
+        fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="lb"><div style="font-size:20px;margin-bottom:2px">${o.icon}</div>
+      <div class="num" style="font-size:${s>170?34:27}px">${o.big}</div>
+      <div class="tiny" style="margin-top:5px">${o.small}</div></div></div>`;
+}
+/* Small percentage donut used for the macro breakdown. */
+function donut(pct,color,label,sub,size){
+  size=size||64; const r=size/2-5, C=2*Math.PI*r, p=clamp(pct,0,1);
+  return `<div class="center">
+    <div style="position:relative;width:${size}px;height:${size}px;margin:0 auto">
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"
+        style="transform:rotate(-90deg)">
+        <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="var(--line)" stroke-width="6" fill="none"/>
+        <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="6" fill="none"
+          stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p)}"
+          style="transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1)"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+        font-size:${size>60?13:11}px;font-weight:750">${Math.round(pct*100)}%</div>
+    </div>
+    <div style="font-size:11.5px;font-weight:700;margin-top:7px">${label}</div>
+    <div class="tiny">${sub}</div></div>`;
+}
+/* Catmull-Rom smoothed polyline — the soft curve used throughout the kit. */
+function smooth(pts){
+  if(pts.length<2) return '';
+  let d=`M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
+    d+=` C${(p1[0]+(p2[0]-p0[0])/6).toFixed(1)} ${(p1[1]+(p2[1]-p0[1])/6).toFixed(1)},`
+      +`${(p2[0]-(p3[0]-p1[0])/6).toFixed(1)} ${(p2[1]-(p3[1]-p1[1])/6).toFixed(1)},`
+      +`${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+function spline(vals,labels,opts){
+  const o=Object.assign({h:150,stroke:'#fff',fill:'rgba(255,255,255,.18)',dot:'#fff',
+    showLast:true,pad:18},opts);
+  const W=340,H=o.h,pad=o.pad,top=16,bot=labels?26:12;
+  const clean=vals.filter(v=>v!=null);
+  if(clean.length<2) return `<div class="empty" style="padding:26px 8px">Not enough data yet — keep logging.</div>`;
+  let lo=Math.min(...clean), hi=Math.max(...clean);
+  if(hi-lo<1){ const m=(hi+lo)/2; lo=m-1; hi=m+1; }
+  const px=i=>pad+(i/(vals.length-1))*(W-pad*2);
+  const py=v=>H-bot-((v-lo)/(hi-lo))*(H-top-bot);
+  const pts=vals.map((v,i)=>[px(i),py(v==null?lo:v)]);
+  const d=smooth(pts);
+  const last=pts[pts.length-1];
+  const lb=labels?labels.map((l,i)=>`<text x="${px(i)}" y="${H-6}" text-anchor="middle">${l}</text>`).join(''):'';
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px">
+    <path d="${d} L${last[0]} ${H-bot} L${pts[0][0]} ${H-bot} Z" fill="${o.fill}" stroke="none"/>
+    <path d="${d}" fill="none" stroke="${o.stroke}" stroke-width="2.6"
+      stroke-linecap="round" stroke-linejoin="round"/>
+    ${o.showLast?`<circle cx="${last[0]}" cy="${last[1]}" r="6.5" fill="${o.dot}"
+      stroke="${o.stroke}" stroke-width="2.5"/>`:''}
+    ${lb}</svg>`;
+}
+function bars(vals,labels,goal){
+  const W=340,H=150,pad=14,bot=24,top=14;
+  const max=Math.max(goal?goal*1.2:0,...vals,1);
+  const bw=(W-pad*2)/vals.length;
+  const y=v=>H-bot-(v/max)*(H-top-bot);
+  const b=vals.map((v,i)=>{
+    const x=pad+i*bw+bw*0.22, w=Math.max(bw*0.56,4), h=Math.max(v>0?3:0,H-bot-y(v));
+    const over=goal&&v>goal*1.05;
+    return `<rect x="${x.toFixed(1)}" y="${y(v).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}"
+      rx="${Math.min(w/2,5)}" fill="${v===0?'var(--line)':(over?'var(--coral)':'var(--violet)')}"/>`;}).join('');
+  const gl=goal?`<line x1="${pad}" x2="${W-pad}" y1="${y(goal)}" y2="${y(goal)}"
+      stroke="var(--violet-3)" stroke-dasharray="3 5" stroke-width="1.4"/>`:'';
+  const lb=labels.map((l,i)=>l?`<text x="${(pad+i*bw+bw/2).toFixed(1)}" y="${H-6}"
+      text-anchor="middle">${l}</text>`:'').join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"
+    style="height:${H}px">${gl}${b}${lb}</svg>`;
+}
+function macBar(l,v,g,col){
+  const pct=clamp(g?v/g*100:0,0,100);
+  return `<div class="mac"><div class="t"><span><i class="sw" style="background:${col}"></i>${l}</span>
+    <span>${Math.round(v)} / ${Math.round(g)} g</span></div>
+    <div class="bar"><i style="width:${pct}%;background:${col}"></i></div></div>`;
+}
+function weekStrip(dates,activeIdx,onclickFn,markFn){
+  return `<div class="week">${dates.map((d,i)=>{
+    const dt=parseISO(d);
+    return `<button class="wd ${i===activeIdx?'on':''}" onclick="${onclickFn}(${i})">
+      <div class="d">${DAYN[dt.getDay()][0]}${DAYN[dt.getDay()][1]}</div>
+      <div class="n">${dt.getDate()}</div>
+      ${markFn&&markFn(d)?'<div class="dot"></div>':'<div style="height:7px"></div>'}</button>`;
+  }).join('')}</div>`;
+}
+
+/* ============================== ROUTER ============================== */
+let tab='today', planDay=0, logDate=today(), statRange=7;
+let recFilter={q:'',type:'all',veg:false,tag:''};
+function go(t){ tab=t; window.scrollTo(0,0); render(); }
+
+const ICONS={
+ today:'<path d="M3 12h4l2.5 7L14 5l2.5 7H21"/>',
+ plan:'<rect x="3" y="4.5" width="18" height="16.5" rx="4"/><path d="M3 10h18M8.5 2.5v4M15.5 2.5v4"/><circle cx="12" cy="15" r="1.6" fill="currentColor" stroke="none"/>',
+ recipes:'<path d="M12 21c4.5 0 8-3.2 8-7.6C20 9 16.8 3 12 3S4 9 4 13.4C4 17.8 7.5 21 12 21z"/><path d="M12 8v6M9 11h6"/>',
+ stats:'<path d="M3.5 20.5h17"/><path d="M6 16l4-4.5 3.5 3L19 7"/><circle cx="19" cy="7" r="1.6" fill="currentColor" stroke="none"/>',
+ me:'<circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.5c0-4.1 3.4-6.6 7.5-6.6s7.5 2.5 7.5 6.6"/>'
+};
+function nav(){
+  const items=[['today','Today'],['plan','Plan'],['recipes','Recipes'],['stats','Progress'],['me','Me']];
+  $('nav').innerHTML=`<div class="inner">${items.map(([k,l])=>
+    `<button class="n ${tab===k?'on':''}" onclick="go('${k}')" aria-label="${l}">
+      <svg viewBox="0 0 24 24">${ICONS[k]}</svg><span>${l}</span></button>`).join('')}</div>`;
+}
+
+/* =============================== TODAY =============================== */
+function todayWeek(){
+  const d=parseISO(today()), off=d.getDay();
+  return Array.from({length:7},(_,i)=>addDays(today(),i-off));
+}
+function pickDay(i){
+  const d=todayWeek()[i];
+  if(parseISO(d)>parseISO(today())) return toast('That day is still in the future');
+  logDate=d; render();
+}
+function viewToday(){
+  const t=T(), tot=dayTotal(logDate), rows=S.log[logDate]||[];
+  const wk=todayWeek(), ai=wk.indexOf(logDate);
+  const isToday=logDate===today();
+  const pct=t.cal?tot.k/t.cal:0;
+  const left=t.cal-tot.k;
+  const dObj=parseISO(logDate);
+  const hour=new Date().getHours();
+  const greet=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+
+  const byMeal={}; rows.forEach((r,i)=>{(byMeal[r.meal]=byMeal[r.meal]||[]).push({...r,i});});
+
+  const meals=SLOTS.map(sl=>{
+    const list=byMeal[sl.k]||[];
+    const sub=Math.round(list.reduce((a,x)=>a+x.k,0));
+    const slotGoal=Math.round(t.cal*sl.share);
+    return `<div class="c">
+      <div class="row" style="align-items:flex-start;margin-bottom:12px">
+        <div><div class="ov">${sl.l}</div>
+          <div class="kcal" style="font-size:15px"><i>🔥</i>
+            <b class="num" style="font-size:21px">${sub}</b>
+            <span class="tiny" style="font-weight:600">kcal / ${slotGoal} kcal</span></div></div>
+        <button class="plus" onclick="openAdd('${sl.k}')" aria-label="Add food">+</button></div>
+      <div class="bar thin" style="margin-bottom:${list.length?14:2}px">
+        <i style="width:${clamp(sub/slotGoal*100,0,100)}%;background:var(--violet)"></i></div>
+      ${list.map(x=>`<div class="it">
+          <div class="tile s">${x.e||'🍽️'}</div>
+          <div class="mid"><div class="nm">${esc(x.n)}</div>
+            <div class="dt">P ${Math.round(x.p)}g · C ${Math.round(x.c)}g · F ${Math.round(x.f)}g</div></div>
+          <div class="rt"><b>${x.k}</b><div class="tiny">cals</div></div>
+          <button class="x" onclick="delLog(${x.i})" aria-label="Remove">✕</button></div>`).join('')}
+    </div>`;}).join('');
+
+  const w=S.water[logDate]||0, st=S.steps[logDate]||0;
+  const wt=S.weights[logDate];
+
+  return `<div class="vh">
+      <div class="ov">${isToday?greet:dObj.toLocaleDateString(undefined,{weekday:'long'})}</div>
+      <h1 class="big">${esc((S.profile.name||'Your day').split(' ')[0])}</h1>
+      <div style="margin-top:18px">${weekStrip(wk,ai,'pickDay',d=>(S.log[d]||[]).length>0)}</div>
+    </div>
+    <div class="sheet-b">
+      <div class="c">
+        <div class="center" style="margin-bottom:4px">
+          <div style="font-size:16px;font-weight:600;line-height:1.45;margin-bottom:14px">
+            ${left>=0?`You have <span class="hl">${Math.round(left)} kcal</span> left today`
+                     :`You are <span class="hl" style="color:var(--coral)">${Math.round(-left)} kcal</span> over`}</div>
+          ${gauge(pct,{icon:'🔥',big:Math.round(tot.k).toLocaleString(),
+            small:'of '+t.cal.toLocaleString()+' kcal',over:tot.k>t.cal*1.02})}
+        </div>
+        <div class="g3" style="margin-top:18px">
+          ${donut(t.p?tot.p/t.p:0,'var(--p)','Protein',Math.round(tot.p)+' / '+t.p+'g')}
+          ${donut(t.c?tot.c/t.c:0,'var(--c)','Carbs',Math.round(tot.c)+' / '+t.c+'g')}
+          ${donut(t.f?tot.f/t.f:0,'var(--f)','Fat',Math.round(tot.f)+' / '+t.f+'g')}
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="c tight">
+          <div class="ov m">💧 Water</div>
+          <div class="row" style="gap:8px">
+            <button class="plus" onclick="bump('water',-1)">−</button>
+            <div class="num" style="font-size:22px">${w}</div>
+            <button class="plus" onclick="bump('water',1)">+</button></div>
+          <div class="bar thin" style="margin-top:11px">
+            <i style="width:${clamp(w/S.prefs.waterGoal*100,0,100)}%;background:var(--blue)"></i></div>
+          <div class="tiny" style="margin-top:6px">of ${S.prefs.waterGoal} glasses</div>
+        </div>
+        <div class="c tight">
+          <div class="ov m">👟 Steps</div>
+          <input type="number" inputmode="numeric" value="${st||''}" placeholder="0"
+            onchange="setSteps(this.value)" aria-label="Steps"
+            style="text-align:center;font-size:20px;font-weight:800;padding:8px;border-radius:13px">
+          <div class="bar thin" style="margin-top:11px">
+            <i style="width:${clamp(st/S.prefs.stepGoal*100,0,100)}%;background:var(--mint)"></i></div>
+          <div class="tiny" style="margin-top:6px">of ${S.prefs.stepGoal.toLocaleString()}</div>
+        </div>
+      </div>
+
+      ${meals}
+
+      <div class="c">
+        <div class="ov m">⚖️ Weight check-in</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input type="number" step="0.1" inputmode="decimal" id="wIn"
+            placeholder="${S.profile.w} kg" value="${wt||''}" aria-label="Weight in kg">
+          <button class="btn s" onclick="logWeight()">Save</button></div>
+        ${wt?`<div class="tiny" style="margin-top:9px">Logged ${wt} kg for this day.</div>`:''}
+      </div>
+      ${backupDue()?`<div class="c" style="border:1.8px dashed var(--violet-3);box-shadow:none">
+        <div class="ov">Reminder</div>
+        <div class="sm" style="font-weight:600;margin-bottom:12px">You have ${Object.keys(S.log).length} days of
+          data and haven't backed up in a while. One tap saves a file you can restore from.</div>
+        <button class="btn ghost s" style="width:100%" onclick="exportData()">Download backup</button></div>`:''}
+    </div>`;
+}
+function bump(k,n){ const v=(S[k][logDate]||0)+n; if(v<0)return; S[k][logDate]=v; save(); render(); }
+function setSteps(v){ S.steps[logDate]=Math.max(0,parseInt(v)||0); save(); render(); }
+function logWeight(){
+  const v=parseFloat($('wIn').value);
+  if(!v||v<20||v>350) return toast('Enter a weight between 20 and 350 kg');
+  S.weights[logDate]=v;
+  if(logDate===today()) S.profile.w=v;
+  save(); toast('Weight saved'); render();
+}
+function delLog(i){ (S.log[logDate]||[]).splice(i,1); save(); render(); }
+function addLog(e){ (S.log[logDate]=S.log[logDate]||[]).push(e); save(); }
+
+/* =============================== PLAN =============================== */
+function setPlanDay(i){ planDay=i; render(); }
+function viewPlan(){
+  if(!S.plan) generatePlan();
+  const t=T(), meals=S.plan.days[planDay]||[], tot=planDayTotals(meals);
+  const dates=Array.from({length:7},(_,i)=>addDays(S.plan.start,i));
+  const diff=Math.round(tot.k-t.cal);
+  const hero=meals.reduce((a,m)=>RECIPES[m.id].p*m.serv>RECIPES[a.id].p*a.serv?m:a,meals[0]);
+  const hr=hero?RECIPES[hero.id]:null;
+
+  const cards=meals.map((m,mi)=>{
+    const sl=SLOTS.find(s=>s.k===m.slot)||SLOTS[2], r=RECIPES[m.id], s=m.serv;
+    return `<div class="c">
+      <div class="row" style="margin-bottom:13px">
+        <div class="ov">${sl.l}</div>
+        <div class="kcal sm"><i>🔥</i>${Math.round(r.k*s)} kcal</div></div>
+      <div class="it tap" style="padding-top:0;border:none" onclick="openRecipe(${r.id})">
+        <div class="tile">${r.e}</div>
+        <div class="mid"><div class="nm">${esc(r.n)}</div>
+          <div class="dt">${s!==1?s+'× serving · ':''}${r.min} min · P ${Math.round(r.p*s)}g</div></div>
+        <div class="rt tiny">›</div></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn ghost s" style="flex:1" onclick="swapMeal(${planDay},${mi})">Swap</button>
+        <button class="btn s" style="flex:1.3" onclick="logPlanned(${planDay},${mi})">Add to journal</button>
+      </div></div>`;}).join('');
+
+  return `<div class="vh">
+      <div class="row" style="align-items:flex-start">
+        <div><div class="ov">Meal plan</div><h1 class="big">This week</h1></div>
+        <button class="chip" style="background:rgba(255,255,255,.2);color:#fff;box-shadow:none"
+          onclick="regen()">↻ New</button></div>
+      <div style="margin-top:18px">${weekStrip(dates,planDay,'setPlanDay')}</div>
+    </div>
+    <div class="sheet-b">
+      ${hr?`<div class="vcard tap" onclick="openRecipe(${hr.id})">
+        <div class="ov">Daily pick</div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="flex:1">
+            <div style="font-size:19px;font-weight:750;letter-spacing:-.4px;line-height:1.25">${esc(hr.n)}</div>
+            <div style="font-size:12.5px;opacity:.85;margin-top:7px;font-weight:550">
+              ${Math.round(hr.p*hero.serv)}g protein · ${Math.round(hr.k*hero.serv)} kcal · ${hr.min} min</div>
+            <div style="margin-top:14px"><span class="btn white s"
+              style="display:inline-block;padding:9px 18px">Let's cook →</span></div>
+          </div>
+          <div style="font-size:56px;line-height:1">${hr.e}</div>
+        </div></div>`:''}
+
+      <div class="c">
+        <div class="row" style="margin-bottom:15px">
+          <div><div class="ov m">Day total</div>
+            <div><b class="num" style="font-size:24px">${Math.round(tot.k).toLocaleString()}</b>
+              <span class="tiny" style="font-weight:600"> / ${t.cal.toLocaleString()} kcal</span></div></div>
+          <span class="chip mini" style="${Math.abs(diff)<=120?'':'background:#FFF0EA;color:#D9622F'}">
+            ${diff>0?'+':''}${diff}</span></div>
+        ${macBar('Protein',tot.p,t.p,'var(--p)')}
+        ${macBar('Carbs',tot.c,t.c,'var(--c)')}
+        ${macBar('Fat',tot.f,t.f,'var(--f)')}
+      </div>
+      ${cards}
+      <button class="btn line" onclick="logWholeDay(${planDay})">Add the whole day to my journal</button>
+      <div class="tiny center" style="margin:14px 0 4px">Servings are scaled automatically to hit
+        your targets. Tap Swap for a different dish in the same slot.</div>
+    </div>`;
+}
+function regen(){ generatePlan(); planDay=0; toast('Fresh week generated'); render(); }
+function swapMeal(d,mi){
+  const veg=S.prefs.veg, cur=S.plan.days[d][mi], slot=cur.slot;
+  const pool=RECIPES.filter(r=>r.t.includes(slot)&&(!veg||r.veg)&&r.id!==cur.id);
+  if(!pool.length) return toast('No alternatives for that slot');
+  const want=cur.serv*RECIPES[cur.id].k;
+  const pick=pool[Math.floor(Math.random()*pool.length)];
+  cur.id=pick.id; cur.serv=clamp(Math.round((want/pick.k)*4)/4,.5,2);
+  save(); render();
+}
+function logPlanned(d,mi){
+  const m=S.plan.days[d][mi], r=RECIPES[m.id], s=m.serv;
+  addLog({n:r.n+(s!==1?` (${s}×)`:''),e:r.e,p:+(r.p*s).toFixed(1),c:+(r.c*s).toFixed(1),
+    f:+(r.f*s).toFixed(1),k:Math.round(r.k*s),meal:m.slot});
+  toast(r.n+' added to today');
+}
+function logWholeDay(d){
+  S.plan.days[d].forEach((m,i)=>logPlanned(d,i));
+  toast('Full day added'); go('today');
+}
+
+/* ============================= RECIPES ============================= */
+const TAGSET=['high-protein','low-carb','quick','vegetarian','fat-loss','high-fibre','grill','meal-prep'];
+function filtered(){
+  const q=recFilter.q.toLowerCase().trim();
+  return RECIPES.filter(r=>{
+    if(recFilter.type!=='all'&&!r.t.includes(recFilter.type)) return false;
+    if(recFilter.veg&&!r.veg) return false;
+    if(recFilter.tag&&!r.tags.includes(recFilter.tag)) return false;
+    if(q&&!(r.n.toLowerCase().includes(q)||r.tags.some(t=>t.includes(q))
+        ||r.ing.some(i=>i[0].toLowerCase().includes(q)))) return false;
+    return true;
+  });
+}
+const THUMB=['linear-gradient(140deg,#EFEBFF,#DCD4FF)','linear-gradient(140deg,#E4F8FA,#CBEFF4)',
+  'linear-gradient(140deg,#FFF1E8,#FFE0CF)','linear-gradient(140deg,#E8F8F0,#D2F0E2)',
+  'linear-gradient(140deg,#FFF6E0,#FFEBC2)','linear-gradient(140deg,#FDE9F1,#FBD9E7)'];
+function recipeGrid(list){
+  if(!list.length) return `<div class="empty"><div class="b">🍽️</div>Nothing matches that search.</div>`;
+  return `<div class="rgrid">${list.map(r=>`<div class="rcard tap" onclick="openRecipe(${r.id})">
+      <div class="th" style="background:${THUMB[r.id%THUMB.length]}">${r.e}</div>
+      <div class="bd"><div class="nm">${esc(r.n)}</div>
+        <div class="mt">🔥 ${r.k} · ${r.p}g protein</div></div></div>`).join('')}</div>`;
+}
+function viewRecipes(){
+  const list=filtered();
+  const types=[['all','All'],['breakfast','Breakfast'],['lunch','Lunch'],['dinner','Dinner'],['snack','Snacks']];
+  return `<div class="vh" style="padding-bottom:30px">
+      <div class="ov">${RECIPES.length} dishes · halal</div>
+      <h1 class="big">Healthy recipes</h1>
+      <div class="sm" style="opacity:.85;margin-top:7px;font-weight:500">
+        High protein, lightly cooked, built on ingredients you can buy locally.</div>
+    </div>
+    <div class="sheet-b">
+      <div class="srch"><span class="i">🔍</span>
+        <input placeholder="Search a dish or ingredient…" value="${esc(recFilter.q)}"
+          aria-label="Search recipes" oninput="recFilter.q=this.value;redrawGrid()"></div>
+      <div class="chips" style="margin-bottom:10px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px">
+        ${types.map(([k,l])=>`<button class="chip ${recFilter.type===k?'on':''}"
+          onclick="recFilter.type='${k}';render()">${l}</button>`).join('')}</div>
+      <div class="chips" style="margin-bottom:16px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px">
+        <button class="chip ${recFilter.veg?'on':''}" onclick="recFilter.veg=!recFilter.veg;render()">🌿 Veg</button>
+        ${TAGSET.map(t=>`<button class="chip ${recFilter.tag===t?'on':''}"
+          onclick="recFilter.tag='${recFilter.tag===t?'':t}';render()">${t.replace(/-/g,' ')}</button>`).join('')}</div>
+      <div class="tiny" style="margin-bottom:12px">${list.length} recipe${list.length===1?'':'s'}</div>
+      <div id="rgrid">${recipeGrid(list)}</div>
+    </div>`;
+}
+function redrawGrid(){ const e=$('rgrid'); if(e) e.innerHTML=recipeGrid(filtered()); }
+
+/* ============================== MODALS ============================== */
+function closeModal(){ $('modal').innerHTML=''; }
+function sheet(body){
+  $('modal').innerHTML=`<div class="ovl" onclick="if(event.target===this)closeModal()">
+    <div class="sh"><div class="grab"></div>
+      <button class="cl" onclick="closeModal()" aria-label="Close">✕</button>
+      <div class="bd">${body}</div></div></div>`;
+}
+let recServ=1;
+function openRecipe(id,keepServ){
+  const r=RECIPES[id];
+  if(!keepServ) recServ=1;
+  const s=recServ, k=Math.round(r.k*s);
+  const P=r.p*s,C=r.c*s,F=r.f*s, tot=P*4+C*4+F*9||1;
+  sheet(`
+    <div style="height:132px;border-radius:24px;background:${THUMB[r.id%THUMB.length]};
+      display:flex;align-items:center;justify-content:center;font-size:62px;margin-bottom:18px">${r.e}</div>
+    <div class="ov">Nutrition</div>
+    <h2 class="mid" style="margin-bottom:12px">${esc(r.n)}</h2>
+    <div class="row" style="margin-bottom:16px">
+      <div class="kcal"><i style="font-size:19px">🔥</i>
+        <b class="num" style="font-size:30px">${k}</b>
+        <span class="tiny" style="font-weight:600">kcal</span></div>
+      <div class="chips">${r.veg?'<span class="chip mini">🌿 Veg</span>':''}
+        <span class="chip mini">⏱ ${r.min} min</span></div></div>
+
+    <div class="ov m">Servings</div>
+    <div class="step" style="margin-bottom:16px">
+      <button onclick="setServ(${r.id},-0.5)">−</button>
+      <div class="v">${s} serving${s===1?'':'s'}</div>
+      <button onclick="setServ(${r.id},0.5)">+</button></div>
+    <button class="btn" style="margin-bottom:20px" onclick="logRecipe(${r.id})">Add to journal</button>
+
+    <div class="c">
+      <div class="ov m">Nutrition fact</div>
+      <div class="g3" style="margin:14px 0 18px">
+        ${donut(P*4/tot,'var(--p)','Protein',Math.round(P)+' g',68)}
+        ${donut(C*4/tot,'var(--c)','Carbs',Math.round(C)+' g',68)}
+        ${donut(F*9/tot,'var(--f)','Fat',Math.round(F)+' g',68)}
+      </div>
+      <div class="it" style="border:none;padding-top:0">
+        <div class="mid"><div class="nm" style="font-weight:600">Protein</div></div>
+        <div class="rt"><b>${Math.round(P)} g</b></div></div>
+      <div class="it"><div class="mid"><div class="nm" style="font-weight:600">Carbohydrate</div></div>
+        <div class="rt"><b>${Math.round(C)} g</b></div></div>
+      <div class="it"><div class="mid"><div class="nm" style="font-weight:600">Fat</div></div>
+        <div class="rt"><b>${Math.round(F)} g</b></div></div>
+    </div>
+
+    <div class="ov m" style="margin-top:22px">Ingredients</div>
+    <div class="c"><ul class="ing">${r.ing.map(i=>
+      `<li>${esc(i[0])}<span>${esc(i[1])}</span></li>`).join('')}</ul></div>
+
+    <div class="ov m" style="margin-top:22px">Method</div>
+    <div class="c"><ol class="st">${r.st.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>
+
+    <div class="chips" style="margin-bottom:18px">${r.tags.map(t=>
+      `<span class="chip mini">${esc(t.replace(/-/g,' '))}</span>`).join('')}</div>
+    <button class="btn line" onclick="toggleSave(${r.id})">
+      ${S.saved.includes(r.id)?'★ Saved to favourites':'☆ Save to favourites'}</button>`);
+}
+function setServ(id,d){ recServ=clamp(+(recServ+d).toFixed(2),0.5,4); openRecipe(id,true); }
+function toggleSave(id){
+  const i=S.saved.indexOf(id);
+  if(i>-1){S.saved.splice(i,1);toast('Removed from favourites');}
+  else{S.saved.push(id);toast('Saved to favourites');}
+  save(); openRecipe(id,true);
+}
+function logRecipe(id){
+  const r=RECIPES[id], s=recServ;
+  const slot=(r.t.length===1&&r.t[0]==='snack')?'snack':r.t[0];
+  addLog({n:r.n+(s!==1?` (${s}×)`:''),e:r.e,p:+(r.p*s).toFixed(1),c:+(r.c*s).toFixed(1),
+    f:+(r.f*s).toFixed(1),k:Math.round(r.k*s),meal:slot});
+  closeModal(); toast(r.n+' added'); go('today');
+}
+
+let addSlot='breakfast', addQ='';
+function openAdd(slot){
+  addSlot=slot; addQ='';
+  sheet(`<div class="ov">Add food</div>
+    <h2 class="mid" style="margin-bottom:16px">${SLOTS.find(s=>s.k===slot).l}</h2>
+    <div class="srch"><span class="i">🔍</span>
+      <input id="fq" placeholder="Search food or recipe…" aria-label="Search food"
+        oninput="addQ=this.value;drawAdd()"></div>
+    <div id="alist">${addResults()}</div>
+    <div class="ov m" style="margin-top:22px">Or enter it manually</div>
+    <div class="c">
+      <div class="fld"><label>Name</label><input id="cn" placeholder="e.g. Ammi's chicken pulao"></div>
+      <div class="g3">
+        <div class="fld"><label>Protein</label><input id="cp" type="number" inputmode="decimal" value="0"></div>
+        <div class="fld"><label>Carbs</label><input id="cc" type="number" inputmode="decimal" value="0"></div>
+        <div class="fld"><label>Fat</label><input id="cf" type="number" inputmode="decimal" value="0"></div>
+      </div>
+      <div class="row" style="margin-bottom:14px">
+        <span class="tiny">Calories are calculated for you</span>
+        <b class="num" style="font-size:19px" id="cpre">0</b></div>
+      <button class="btn" onclick="addCustom()">Add entry</button>
+    </div>`);
+  ['cp','cc','cf'].forEach(k=>{const e=$(k); if(e) e.addEventListener('input',preview);});
+}
+function preview(){
+  const g=k=>parseFloat($(k).value)||0;
+  const e=$('cpre'); if(e) e.textContent=kcal(g('cp'),g('cc'),g('cf'));
+}
+function addResults(){
+  const q=addQ.toLowerCase().trim();
+  const recs=RECIPES.filter(r=>q&&(r.n.toLowerCase().includes(q))).slice(0,6);
+  const foods=FOODS.filter(f=>!q||f.n.toLowerCase().includes(q)).slice(0,q?18:12);
+  if(!foods.length&&!recs.length) return `<div class="empty">No match — add it manually below.</div>`;
+  const row=(nm,sub,k,fn,ic,bg)=>`<div class="it tap" onclick="${fn}">
+      <div class="tile s" ${bg?`style="background:${bg}"`:''}>${ic}</div>
+      <div class="mid"><div class="nm">${esc(nm)}</div><div class="dt">${esc(sub)}</div></div>
+      <div class="rt"><b>${k}</b><div class="tiny">cals</div></div></div>`;
+  return `<div class="c">
+    ${recs.map(r=>row(r.n,'recipe · 1 serving',r.k,`pickRecipe(${r.id})`,r.e,THUMB[r.id%THUMB.length])).join('')}
+    ${foods.map(f=>row(f.n,f.s,f.k,`pickFood(${f.id})`,'🍽️')).join('')}</div>`;
+}
+function drawAdd(){ const e=$('alist'); if(e) e.innerHTML=addResults(); }
+function pickFood(id){
+  const f=FOODS[id];
+  addLog({n:f.n+' ('+f.s+')',e:'🍽️',p:f.p,c:f.c,f:f.f,k:f.k,meal:addSlot});
+  closeModal(); toast(f.n+' added'); render();
+}
+function pickRecipe(id){
+  const r=RECIPES[id];
+  addLog({n:r.n,e:r.e,p:r.p,c:r.c,f:r.f,k:r.k,meal:addSlot});
+  closeModal(); toast(r.n+' added'); render();
+}
+function addCustom(){
+  const n=$('cn').value.trim(); if(!n) return toast('Give the entry a name');
+  const g=k=>Math.max(0,parseFloat($(k).value)||0);
+  const p=g('cp'),c=g('cc'),f=g('cf');
+  if(!p&&!c&&!f) return toast('Enter at least one macro');
+  addLog({n,e:'📝',p,c,f,k:kcal(p,c,f),meal:addSlot});
+  closeModal(); toast('Added'); render();
+}
+
+/* ============================= PROGRESS ============================= */
+function lastDays(n){ const a=[]; for(let i=n-1;i>=0;i--) a.push(addDays(today(),-i)); return a; }
+function viewStats(){
+  const t=T(), days=lastDays(statRange);
+  const cals=days.map(d=>dayTotal(d).k);
+  const logged=cals.filter(v=>v>0);
+  const avg=logged.length?Math.round(logged.reduce((a,b)=>a+b,0)/logged.length):0;
+  const onTarget=logged.filter(v=>Math.abs(v-t.cal)<=t.cal*0.1).length;
+  const adherence=logged.length?Math.round(onTarget/logged.length*100):0;
+  const streak=(()=>{let n=0;for(let i=0;i<365;i++){if((S.log[addDays(today(),-i)]||[]).length)n++;else break;}return n;})();
+
+  const wAll=Object.entries(S.weights).sort((a,b)=>a[0]<b[0]?-1:1);
+  const wIn=wAll.filter(([d])=>days.includes(d));
+  const wSeries=wIn.length>1?wIn:wAll;
+  const delta=wSeries.length>1?+(wSeries[wSeries.length-1][1]-wSeries[0][1]).toFixed(1):0;
+
+  const avgP=logged.length?Math.round(days.reduce((a,d)=>a+dayTotal(d).p,0)/logged.length):0;
+  const waterDays=days.map(d=>S.water[d]||0).filter(v=>v>0);
+  const avgW=waterDays.length?Math.round(waterDays.reduce((a,b)=>a+b,0)/waterDays.length):0;
+  const stepDays=days.map(d=>S.steps[d]||0).filter(v=>v>0);
+  const avgS=stepDays.length?Math.round(stepDays.reduce((a,b)=>a+b,0)/stepDays.length):0;
+
+  const labels=days.map((d,i)=>{
+    const step=Math.ceil(days.length/7);
+    return (days.length<=7||i%step===0||i===days.length-1)?String(parseISO(d).getDate()):'';
+  });
+  const b=bmi(S.profile), band=bmiBand(b), proj=weeklyChange(S.profile);
+
+  return `<div class="vh">
+      <div class="ov">Progress</div>
+      <h1 class="big">${avg?`You averaged <span style="opacity:.75">${avg.toLocaleString()} kcal</span>`
+        :'Start logging to see trends'}</h1>
+      <div class="sm" style="opacity:.8;margin-top:8px;font-weight:500">
+        ${logged.length} of the last ${statRange} days logged</div>
+      <div class="seg" style="margin-top:18px">
+        ${[[7,'Week'],[30,'Month'],[90,'90 days']].map(([n,l])=>
+          `<button class="${statRange===n?'on':''}" onclick="statRange=${n};render()">${l}</button>`).join('')}
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="c">
+        <div class="ov m">Calories logged</div>
+        ${bars(cals,labels,t.cal)}
+        <div class="tiny center">Dashed line is your ${t.cal.toLocaleString()} kcal target</div>
+      </div>
+
+      <div class="g3" style="margin-bottom:16px">
+        <div class="stat"><b>${avg?avg.toLocaleString():'—'}</b><span>avg kcal</span>
+          <div class="dl ${avg>t.cal?'up':'down'}">${avg?(avg-t.cal>0?'+':'')+(avg-t.cal):'no data'}</div></div>
+        <div class="stat"><b>${adherence}%</b><span>on target</span>
+          <div class="dl">${onTarget}/${logged.length} days</div></div>
+        <div class="stat"><b>${streak}</b><span>day streak</span>
+          <div class="dl">${streak>2?'🔥 nice':'keep going'}</div></div>
+      </div>
+
+      <div class="vcard">
+        <div class="row" style="margin-bottom:6px">
+          <div><div class="ov">Weight trend</div>
+            <div><b class="num" style="font-size:26px">${wSeries.length?wSeries[wSeries.length-1][1]:S.profile.w}</b>
+              <span style="font-size:12px;opacity:.8;font-weight:600"> kg</span></div></div>
+          ${wSeries.length>1?`<span class="chip" style="background:rgba(255,255,255,.22);color:#fff;box-shadow:none">
+            ${delta>0?'+':''}${delta} kg</span>`:''}</div>
+        ${spline(wSeries.map(x=>x[1]),null,{h:130})}
+        <div class="tiny" style="color:rgba(255,255,255,.78);margin-top:6px">
+          At your current targets you'd change about <b>${proj>0?'+':''}${proj} kg per week</b>.</div>
+      </div>
+
+      <div class="g3" style="margin-bottom:16px">
+        <div class="stat"><b>${avgP||'—'}</b><span>avg protein</span><div class="dl">${t.p} g target</div></div>
+        <div class="stat"><b>${avgW||'—'}</b><span>avg water</span><div class="dl">glasses/day</div></div>
+        <div class="stat"><b>${avgS?(avgS/1000).toFixed(1)+'k':'—'}</b><span>avg steps</span>
+          <div class="dl">${(S.prefs.stepGoal/1000)}k goal</div></div>
+      </div>
+
+      <div class="c">
+        <div class="ov m">Body</div>
+        <div class="it" style="padding-top:6px">
+          <div class="tile s" style="background:#EFECFF">📏</div>
+          <div class="mid"><div class="nm">BMI ${b}</div>
+            <div class="dt">${htLabel(S.profile.h)} · ${S.profile.w} kg</div></div>
+          <div class="rt"><b style="color:${band[1]};font-size:13.5px">${band[0]}</b></div></div>
+        <div class="it"><div class="tile s" style="background:#E4F8FA">🔥</div>
+          <div class="mid"><div class="nm">Maintenance (TDEE)</div>
+            <div class="dt">${t.bmr.toLocaleString()} kcal burned at complete rest</div></div>
+          <div class="rt"><b>${t.tdee.toLocaleString()}</b></div></div>
+        <div class="it"><div class="tile s" style="background:#FFF1E8">${GOALS[S.profile.goal].e}</div>
+          <div class="mid"><div class="nm">${GOALS[S.profile.goal].l}</div>
+            <div class="dt">your daily calorie target</div></div>
+          <div class="rt"><b>${t.cal.toLocaleString()}</b></div></div>
+      </div>
+    </div>`;
+}
+
+/* =============================== ME =============================== */
+function viewMe(){
+  const p=S.profile;
+  if(!p) return onboarding();
+  const t=targets(p), b=bmi(p), band=bmiBand(b), h=cmToFtIn(p.h);
+  const initial=(p.name||'?').trim().charAt(0).toUpperCase()||'🙂';
+  const rowTile=(bg,ic,nm,dt,right)=>`<div class="it">
+    <div class="tile s" style="background:${bg}">${ic}</div>
+    <div class="mid"><div class="nm">${nm}</div><div class="dt">${dt}</div></div>
+    <div class="rt">${right}</div></div>`;
+  return `<div class="vh">
+      <div style="display:flex;align-items:center;gap:15px">
+        <div style="width:62px;height:62px;border-radius:22px;background:rgba(255,255,255,.22);
+          display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800">${initial}</div>
+        <div><h1 class="big" style="font-size:23px">${esc(p.name||'Your profile')}</h1>
+          <div class="sm" style="opacity:.85;font-weight:500;margin-top:3px">
+            ${GOALS[p.goal].l} · ${ACT[p.act].l}</div></div></div>
+    </div>
+    <div class="sheet-b">
+      <div class="c">
+        <div class="ov m">Daily targets</div>
+        <div class="row" style="margin:6px 0 16px">
+          <div class="kcal"><i style="font-size:18px">🔥</i>
+            <b class="num" style="font-size:30px">${t.cal.toLocaleString()}</b>
+            <span class="tiny" style="font-weight:600">kcal</span></div>
+          <span class="chip mini">${GOALS[p.goal].e} ${GOALS[p.goal].l}</span></div>
+        <div class="g3">
+          ${donut(1,'var(--p)','Protein',t.p+' g',66)}
+          ${donut(1,'var(--c)','Carbs',t.c+' g',66)}
+          ${donut(1,'var(--f)','Fat',t.f+' g',66)}
+        </div>
+        <div class="tiny center" style="margin-top:16px">BMR ${t.bmr.toLocaleString()} ·
+          TDEE ${t.tdee.toLocaleString()} · BMI ${b}
+          (<span style="color:${band[1]};font-weight:750">${band[0]}</span>)</div>
+      </div>
+
+      <div class="c">
+        <div class="ov m">Your details</div>
+        <div class="g2" style="margin-top:14px">
+          <div class="fld"><label>Age</label><input id="pAge" type="number" inputmode="numeric" value="${p.age}"></div>
+          <div class="fld"><label>Sex</label><select id="pSex">
+            <option value="m"${p.sex==='m'?' selected':''}>Male</option>
+            <option value="f"${p.sex==='f'?' selected':''}>Female</option></select></div>
+        </div>
+        <label>Height</label>
+        <div class="g2" style="margin-bottom:15px">
+          <div style="position:relative">
+            <input id="pFt" type="number" inputmode="numeric" value="${h.ft}" aria-label="Feet">
+            <span class="tiny" style="position:absolute;right:15px;top:15px">ft</span></div>
+          <div style="position:relative">
+            <input id="pIn" type="number" inputmode="numeric" value="${h.in}" aria-label="Inches">
+            <span class="tiny" style="position:absolute;right:15px;top:15px">in</span></div>
+        </div>
+        <div class="fld"><label>Weight (kg)</label>
+          <input id="pW" type="number" step="0.1" inputmode="decimal" value="${p.w}"></div>
+        <div class="fld"><label>Activity level</label><select id="pAct">
+          ${Object.entries(ACT).map(([k,v])=>
+            `<option value="${k}"${p.act===k?' selected':''}>${v.l} — ${v.d}</option>`).join('')}</select></div>
+        <div class="fld"><label>Goal</label><select id="pGoal">
+          ${Object.entries(GOALS).map(([k,v])=>
+            `<option value="${k}"${p.goal===k?' selected':''}>${v.e} ${v.l} — ${v.d}</option>`).join('')}</select></div>
+        <button class="btn" onclick="saveProfile()">Save changes</button>
+      </div>
+
+      <div class="c">
+        <div class="ov m">Preferences</div>
+        ${rowTile('#E8F8F0','🌿','Vegetarian plans','Only meat-free dishes',
+          `<button class="chip mini ${S.prefs.veg?'on':''}" onclick="togglePref('veg')">${S.prefs.veg?'On':'Off'}</button>`)}
+        ${rowTile('#EFECFF','🌙','Dark mode','Easier at night',
+          `<button class="chip mini ${S.prefs.dark?'on':''}" onclick="togglePref('dark')">${S.prefs.dark?'On':'Off'}</button>`)}
+        ${rowTile('#E4F8FA','💧','Water goal','glasses per day',
+          `<input type="number" style="width:74px;padding:9px;text-align:center;border-radius:12px"
+            value="${S.prefs.waterGoal}" aria-label="Water goal"
+            onchange="S.prefs.waterGoal=Math.max(1,+this.value||8);save();render()">`)}
+        ${rowTile('#FFF6E0','👟','Step goal','steps per day',
+          `<input type="number" style="width:92px;padding:9px;text-align:center;border-radius:12px"
+            value="${S.prefs.stepGoal}" aria-label="Step goal"
+            onchange="S.prefs.stepGoal=Math.max(1000,+this.value||8000);save();render()">`)}
+      </div>
+
+      ${S.saved.length?`<div class="c">
+        <div class="ov m">Favourites (${S.saved.length})</div>
+        ${S.saved.map(id=>{const r=RECIPES[id];return `<div class="it tap" onclick="openRecipe(${id})">
+          <div class="tile s" style="background:${THUMB[id%THUMB.length]}">${r.e}</div>
+          <div class="mid"><div class="nm">${esc(r.n)}</div>
+            <div class="dt">${r.k} kcal · ${r.p}g protein</div></div>
+          <div class="rt tiny">›</div></div>`;}).join('')}</div>`:''}
+
+      <div class="c">
+        <div class="ov m">Your data</div>
+        <div class="sm" style="font-weight:520;margin:10px 0 16px;line-height:1.55">
+          Everything lives in this browser on this device — nothing is uploaded anywhere.
+          <b>${Object.keys(S.log).length}</b> day${Object.keys(S.log).length===1?'':'s'} logged,
+          <b>${Object.keys(S.weights).length}</b> weight entr${Object.keys(S.weights).length===1?'y':'ies'}.
+        </div>
+        <div id="persistNote" class="tiny" style="margin-bottom:14px"></div>
+        <button class="btn" id="installBtn" style="display:none;margin-bottom:9px" onclick="promptInstall()">⬇ Install NutriPlan on this device</button>
+        <button class="btn ghost" style="margin-bottom:9px" onclick="exportData()">⬇ Download backup file</button>
+        <button class="btn line" style="margin-bottom:9px" onclick="$('impFile').click()">⬆ Restore from backup</button>
+        <input type="file" id="impFile" accept="application/json,.json" style="display:none"
+          onchange="if(this.files[0])importBackup(this.files[0])">
+        <button class="btn danger" onclick="wipe()">Erase everything</button>
+      </div>
+      <div class="tiny center" style="margin:20px 0 8px;line-height:1.6">
+        All recipes are halal. Nutrition figures are estimates, not lab measurements —
+        speak to a doctor or dietitian before any big dietary change.</div>
+    </div>`;
+}
+function saveProfile(){
+  const p=S.profile;
+  const age=+$('pAge').value, ft=+$('pFt').value, inch=+$('pIn').value, w=+$('pW').value;
+  const h=ftInToCm(ft,inch);
+  if(!(age>=13&&age<=100))  return toast('Age must be between 13 and 100');
+  if(!(inch>=0&&inch<12))   return toast('Inches must be between 0 and 11');
+  if(!(h>=120&&h<=230))     return toast("Height must be between 3'11\" and 7'7\"");
+  if(!(w>=30&&w<=300))      return toast('Weight must be between 30 and 300 kg');
+  Object.assign(p,{age,h,w,sex:$('pSex').value,act:$('pAct').value,goal:$('pGoal').value});
+  S.weights[today()]=w;
+  generatePlan(); save(); toast('Targets updated'); render();
+}
+function togglePref(k){
+  S.prefs[k]=!S.prefs[k]; save();
+  if(k==='dark') document.body.classList.toggle('dark',S.prefs.dark);
+  if(k==='veg') generatePlan();
+  render();
+}
+function exportData(){
+  S.prefs.lastBackup=Date.now(); save();
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='nutriplan-backup-'+today()+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast('Backup downloaded'); render();
+}
+function wipe(){
+  if(!confirm('This erases your profile, food log and weight history for good. Continue?')) return;
+  if(!confirm('Really erase everything? Download a backup first if you might want it back.')) return;
+  localStorage.removeItem(KEY); S=blank(); document.body.classList.remove('dark');
+  tab='today'; step=0; render();
+}
+
+/* ============================ ONBOARDING ============================ */
+let step=0, draft={name:'',sex:'m',age:'',ft:'',in:'',w:'',act:'mod',goal:'loss'};
+function draftProfile(){
+  return {name:draft.name,sex:draft.sex,age:+draft.age,h:ftInToCm(draft.ft,draft.in),
+          w:+draft.w,act:draft.act,goal:draft.goal};
+}
+function onboarding(){
+  const dots=`<div class="dots" style="margin-bottom:26px">${[0,1,2,3].map(i=>
+    `<i style="width:${i===step?22:8}px;background:${i<=step?'var(--violet)':'var(--line)'}"></i>`).join('')}</div>`;
+
+  if(step===0) return `<div class="vh" style="min-height:64vh;display:flex;flex-direction:column;
+      justify-content:center;text-align:center;padding-top:60px">
+      <div style="font-size:64px;margin-bottom:18px">🥗</div>
+      <h1 class="big" style="font-size:33px">NutriPlan</h1>
+      <div style="opacity:.88;margin-top:12px;font-size:14.5px;line-height:1.6;font-weight:500;
+        max-width:330px;margin-left:auto;margin-right:auto">
+        Healthy halal meal plans, calorie tracking and progress charts —
+        built around ingredients you can actually buy locally.</div></div>
+    <div class="sheet-b">
+      <div class="c">
+        <div class="it" style="padding-top:4px">
+          <div class="tile" style="background:#EFECFF">🧮</div>
+          <div class="mid"><div class="nm">Targets from your body</div>
+            <div class="dt">Mifflin-St Jeor BMR and TDEE</div></div></div>
+        <div class="it"><div class="tile" style="background:#E8F8F0">🥗</div>
+          <div class="mid"><div class="nm">${RECIPES.length} healthy recipes</div>
+            <div class="dt">High protein, grilled and baked, no deep frying</div></div></div>
+        <div class="it"><div class="tile" style="background:#E4F8FA">📊</div>
+          <div class="mid"><div class="nm">Track everything</div>
+            <div class="dt">Calories, weight, water and steps</div></div></div>
+        <div class="it"><div class="tile" style="background:#FFF6E0">🔒</div>
+          <div class="mid"><div class="nm">Stays on your device</div>
+            <div class="dt">No account, no servers, nothing uploaded</div></div></div>
+      </div>
+      <button class="btn" onclick="step=1;render()">Get started</button>
+      <div class="tiny center" style="margin-top:16px">Already have a backup file?
+        <a href="#" onclick="event.preventDefault();$('obImp').click()"
+          style="color:var(--violet);font-weight:700">Restore it</a>
+        <input type="file" id="obImp" accept="application/json,.json" style="display:none"
+          onchange="if(this.files[0])importBackup(this.files[0])"></div>
+    </div>`;
+
+  if(step===1) return `<div class="wrap" style="padding-top:calc(30px + env(safe-area-inset-top))">
+      ${dots}
+      <h1 class="big">About you</h1>
+      <div class="muted sm" style="margin:8px 0 24px;font-weight:500">
+        Used only to work out how many calories you need. It never leaves this device.</div>
+      <div class="fld"><label>What should I call you?</label>
+        <input id="oName" value="${esc(draft.name)}" placeholder="Your name"></div>
+      <div class="fld"><label>Sex — this changes the BMR formula</label>
+        <div class="chips">
+          <button class="chip ${draft.sex==='m'?'on':''}" onclick="draft.sex='m';render()">Male</button>
+          <button class="chip ${draft.sex==='f'?'on':''}" onclick="draft.sex='f';render()">Female</button>
+        </div></div>
+      <div class="g2">
+        <div class="fld"><label>Age</label>
+          <input id="oAge" type="number" inputmode="numeric" value="${draft.age}" placeholder="28"></div>
+        <div class="fld"><label>Weight (kg)</label>
+          <input id="oW" type="number" inputmode="decimal" step="0.1" value="${draft.w}" placeholder="78"></div>
+      </div>
+      <label>Height</label>
+      <div class="g2" style="margin-bottom:24px">
+        <div style="position:relative">
+          <input id="oFt" type="number" inputmode="numeric" value="${draft.ft}" placeholder="5" aria-label="Feet">
+          <span class="tiny" style="position:absolute;right:16px;top:15px">ft</span></div>
+        <div style="position:relative">
+          <input id="oIn" type="number" inputmode="numeric" value="${draft.in}" placeholder="9" aria-label="Inches">
+          <span class="tiny" style="position:absolute;right:16px;top:15px">in</span></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn line" style="flex:0 0 92px" onclick="step=0;render()">Back</button>
+        <button class="btn" onclick="stepOne()">Continue</button></div></div>`;
+
+  if(step===2) return `<div class="wrap" style="padding-top:calc(30px + env(safe-area-inset-top))">
+      ${dots}
+      <h1 class="big">How active are you?</h1>
+      <div class="muted sm" style="margin:8px 0 22px;font-weight:500">
+        Be honest — almost everyone picks one level too high.</div>
+      <div class="c">
+        ${Object.entries(ACT).map(([k,v],i)=>`<div class="it tap" onclick="draft.act='${k}';render()"
+          style="${i===0?'padding-top:4px':''}">
+          <div class="tile s" style="${draft.act===k?'background:var(--violet);color:#fff':''}">
+            ${draft.act===k?'✓':'○'}</div>
+          <div class="mid"><div class="nm">${v.l}</div><div class="dt">${v.d}</div></div></div>`).join('')}
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn line" style="flex:0 0 92px" onclick="step=1;render()">Back</button>
+        <button class="btn" onclick="step=3;render()">Continue</button></div></div>`;
+
+  const p=draftProfile();
+  return `<div class="wrap" style="padding-top:calc(30px + env(safe-area-inset-top))">
+      ${dots}
+      <h1 class="big">What's the goal?</h1>
+      <div class="muted sm" style="margin:8px 0 22px;font-weight:500">
+        You burn roughly <b class="hl">${tdee(p).toLocaleString()} kcal</b> a day at your
+        current size and activity.</div>
+      <div class="c">
+        ${Object.entries(GOALS).map(([k,v],i)=>{const tt=targets({...p,goal:k});
+          return `<div class="it tap" onclick="draft.goal='${k}';render()"
+            style="${i===0?'padding-top:4px':''}">
+            <div class="tile s" style="${draft.goal===k?'background:var(--violet)':'background:var(--lav)'}">${v.e}</div>
+            <div class="mid"><div class="nm">${v.l}</div><div class="dt">${v.d}</div></div>
+            <div class="rt"><b>${tt.cal.toLocaleString()}</b><div class="tiny">kcal</div></div></div>`;}).join('')}
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn line" style="flex:0 0 92px" onclick="step=2;render()">Back</button>
+        <button class="btn" onclick="finish()">Build my plan</button></div></div>`;
+}
+function stepOne(){
+  draft.name=$('oName').value.trim();
+  draft.age=+$('oAge').value; draft.ft=+$('oFt').value; draft.in=+$('oIn').value; draft.w=+$('oW').value;
+  const h=ftInToCm(draft.ft,draft.in);
+  if(!(draft.age>=13&&draft.age<=100)) return toast('Enter an age between 13 and 100');
+  if(!(draft.in>=0&&draft.in<12))      return toast('Inches must be between 0 and 11');
+  if(!(h>=120&&h<=230))                return toast("Enter a height between 3'11\" and 7'7\"");
+  if(!(draft.w>=30&&draft.w<=300))     return toast('Enter a weight between 30 and 300 kg');
+  step=2; render();
+}
+function finish(){
+  S.profile=draftProfile();
+  S.weights[today()]=+draft.w;
+  generatePlan(); save(); tab='today'; step=0;
+  requestPersistence().then(()=>{});
+  toast('All set — your plan is ready'); render();
+}
+
+/* ============================== RENDER ============================== */
+function render(){
+  if(parseISO(logDate)>parseISO(today())) logDate=today();
+  if(!S.profile){ $('app').innerHTML=onboarding(); $('nav').innerHTML=''; return; }
+  const views={today:viewToday,plan:viewPlan,recipes:viewRecipes,stats:viewStats,me:viewMe};
+  $('app').innerHTML=(views[tab]||viewToday)();
+  nav();
+  if(tab==='me') showPersistNote();
+}
+function showPersistNote(){
+  const el=$('persistNote'); if(!el) return;
+  if(!storageWorks()){
+    el.innerHTML=`<b style="color:var(--coral)">⚠ This browser is blocking storage.</b>
+      You are probably in a private/incognito window — data will vanish when you close it.`;
+    return;
+  }
+  if(storagePersisted===true) el.innerHTML='🔒 Storage is marked persistent — the browser will not evict your data.';
+  else el.innerHTML='Data survives closing the browser and restarting your phone. '
+    +'It is only lost if you clear site data or use a private window — keep a backup file.';
+}
+
+/* =============================== INIT =============================== */
+document.body.classList.toggle('dark', !!S.prefs.dark);
+if(S.profile && !S.plan) generatePlan();
+requestPersistence().then(()=>{ if(tab==='me') showPersistNote(); });
+render();
+window.addEventListener('pageshow',()=>{ if(logDate!==today() && !S.log[logDate]) { } });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') save(); });
+window.addEventListener('beforeunload',save);
+
+/* ---------------- self-test, console only ---------------- */
+window.__test=function(){
+  const out=[]; const ok=(n,c)=>out.push((c?'PASS ':'FAIL ')+n);
+  ok('BMR male 80kg/180cm/30y = 1780', bmr({sex:'m',w:80,h:180,age:30})===1780);
+  ok('BMR female 65kg/165cm/30y = 1370', bmr({sex:'f',w:65,h:165,age:30})===1370);
+  ok('TDEE moderate', tdee({sex:'m',w:80,h:180,age:30,act:'mod'})===Math.round(1780*1.55));
+  ok("ft/in round trip 5'9\"", htLabel(ftInToCm(5,9))==='5\'9"');
+  ok("6'0\" = 182.9cm", Math.abs(ftInToCm(6,0)-182.9)<0.1);
+  ok('cm->ft/in 175cm', htLabel(175)==='5\'9"');
+  const t=targets({sex:'m',w:80,h:180,age:30,act:'mod',goal:'loss'});
+  ok('macros sum to calories', Math.abs(kcal(t.p,t.c,t.f)-t.cal)<=60);
+  ok('cut is below maintenance', t.cal<t.tdee);
+  ok('safe calorie floor', targets({sex:'f',w:40,h:150,age:70,act:'sed',goal:'loss'}).cal>=1200);
+  ok('recipe kcal derived from macros', RECIPES.every(r=>r.k===kcal(r.p,r.c,r.f)));
+  ok('no frying oil in any ingredient list',
+     !RECIPES.some(r=>r.ing.some(i=>/oil for frying|for deep fry/i.test(i[0]))));
+  ok('no deep-frying instructions',
+     !RECIPES.some(r=>/\bdeep[- ]fry\b/i.test(r.st.join(' ').replace(/without deep frying/gi,''))));
+  /* Paneer and whole eggs are naturally fat-dense whole foods; 55% is the
+     honest ceiling for them. What matters is that no main is a fat bomb. */
+  ok('no main exceeds 55% of calories from fat',
+     RECIPES.filter(r=>r.t.includes('dinner')).every(r=>r.f*9/r.k < 0.55));
+  ok('mains average over 30% of calories from protein',
+     (()=>{const m=RECIPES.filter(r=>r.t.includes('dinner'));
+       return m.reduce((a,r)=>a+r.p*4/r.k,0)/m.length > 0.30;})());
+  ok('every dish has protein', RECIPES.every(r=>r.p>=3));
+  ok('mains are protein-dense', RECIPES.filter(r=>r.t.includes('dinner')).every(r=>r.p>=15));
+  ok('every slot has options', SLOTS.every(s=>RECIPES.some(r=>r.t.includes(s.k))));
+  ok('veg options in every slot', SLOTS.every(s=>RECIPES.some(r=>r.t.includes(s.k)&&r.veg)));
+  generatePlan();
+  ok('plan has 7 days', S.plan.days.length===7);
+  ok('every day has 4+ meals', S.plan.days.every(d=>d.length>=4));
+  ok('servings plausible', S.plan.days.every(d=>d.every(m=>m.serv>=.5&&m.serv<=2)));
+  ok('plan within 250 kcal of target',
+     Math.max(...S.plan.days.map(d=>Math.abs(planDayTotals(d).k-T().cal)))<250);
+  ok('storage available', storageWorks());
+  console.log(out.join('\n'));
+  return out;
+};
+
+/* Register the service worker so the app opens offline once installed.
+   Skipped on file:// where service workers are not permitted. */
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+/* Chrome fires this instead of installing straight away; surface our own
+   button so the install path is obvious on a phone. */
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredInstall = e;
+  const b = document.getElementById('installBtn');
+  if (b) b.style.display = 'block';
+});
+function promptInstall(){
+  if (!deferredInstall) return toast('Use your browser menu → Install app');
+  deferredInstall.prompt();
+  deferredInstall.userChoice.finally(() => { deferredInstall = null; });
+}
+
+</script>
+</body>
+</html>
