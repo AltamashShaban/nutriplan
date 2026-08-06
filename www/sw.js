@@ -1,6 +1,6 @@
 /* NutriPlan service worker — cache-first so the app opens with no network.
    Bump CACHE when you change any asset; the old cache is then deleted. */
-const CACHE = 'nutriplan-v1';
+const CACHE = 'nutriplan-v22';
 const ASSETS = [
   './', './index.html', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png',
@@ -23,7 +23,6 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
-      // Cache same-origin successes so the app keeps working offline.
       if (res.ok && new URL(e.request.url).origin === location.origin) {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));
