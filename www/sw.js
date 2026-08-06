@@ -1,6 +1,6 @@
 /* NutriPlan service worker — cache-first so the app opens with no network.
    Bump CACHE when you change any asset; the old cache is then deleted. */
-const CACHE = 'nutriplan-v22';
+const CACHE = 'nutriplan-v26';
 const ASSETS = [
   './', './index.html', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png',
