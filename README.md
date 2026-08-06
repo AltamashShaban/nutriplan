@@ -30,6 +30,7 @@ Nothing to install locally. This is the fastest route.
 
 Needs **JDK 17** and the Android SDK (Android Studio bundles both).
 JDK 21 will fail — Android Gradle Plugin 8.2 expects 17.
+Node 20 or newer; the cloud build uses Node 22.
 
 ```bash
 npm install
